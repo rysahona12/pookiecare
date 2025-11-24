@@ -1,0 +1,68 @@
+Changes made on this Branch
+Purpose of adding two features, Cart Logic and Order Form Logic
+
+1. Added a Checkout Form
+    • Located in products/forms.py
+    • Introduces CheckoutForm to capture shipping/contact info plus optional note. Introduced CheckoutForm to collect shipping/contact fields and optional note; needed to validate and pre-fill user address info during checkout instead of manually parsing request. 
+    • POST in the view. 
+
+2. Added a backend for Cart/checkout:
+    • In products/views.py it now includes: 
+        [Line 79-124] add-to-cart, 
+        [Line 127-146] cart display, 
+        [Line 149-176] quantity update, 
+        [Line 179-190] remove item, 
+        [Line 193-248] checkout flow (stock-aware, saves user address info, completes order) and passes cart counts to templates
+    • The new views let authenticated users add items (respecting available_stock), edit/remove them, and run complete_order() to decrement stock—otherwise the cart/order models would stay unused. 
+    • In products/urls.py: Registered routes (cart, add_to_cart, update_cart_item, remove_cart_item, checkout) so the new views are reachable; previously only home/product detail were exposed.
+      
+3. Frontend updates:
+    • In products/templates/products/home.html: refreshed header/cart badge, message display, add-to-cart buttons, cleaned text, and price formatting. 
+    • In products/templates/products/product_detail.html: added cart link, message display, quantity add-to-cart form, and styling refinements. 
+    • Added new, in products/templates/products/cart.html: cart page with line items, quantity updates, removal, totals, and checkout CTA (call to action). New page to render Order.items with quantity updates/removal and total; needed a UI to exercise the cart endpoints.
+    • Added new, in products/templates/products/checkout.html: checkout form tied to CheckoutForm, order summary, and submit action. New page to render CheckoutForm plus order summary and submit to checkout_view; needed to capture required fields and complete orders with stock validation.
+      
+In Summary:
+    I. Added a cart flow because the project needed users to save products, review them later, and adjust quantities/removals before buying. 
+    II. Added an order/checkout flow because placing an order requires capturing shipping/contact details and validating stock before completion. 
+    III. Updated templates to surface these flows in the UI (cart badge, add-to-cart buttons, cart page, checkout form) so the backend logic is reachable and usable. 
+
+
+pookiecare/
+├── manage.py
+├── requirements.txt
+├── README.md
+├── media/                                 # User-uploaded files (product images)
+│   └── products/
+│       └── images/
+├── pookiecare/                            # Main project settings
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── urls.py
+│   ├── wsgi.py
+│   └── asgi.py
+├── user/                                  # User management application
+│   ├── models.py                          # Custom User model
+│   ├── views.py                           # Authentication views
+│   ├── forms.py                           # Registration forms
+│   ├── admin.py                           # Admin configuration
+│   ├── backends.py                        # Email authentication backend
+│   └── templates/                         # User templates
+└── products/                              # Products & orders application
+    ├── models.py                          # Product, Brand, Category, Order models
+    ├── forms.py                           # NEW: CheckoutForm for shipping/contact info
+    ├── views.py                           # Expanded: Cart logic & checkout/order flow
+    │                                       #  - add_to_cart_view
+    │                                       #  - cart_view
+    │                                       #  - update_cart_item_view
+    │                                       #  - remove_cart_item_view
+    │                                       #  - checkout_view (complete order + stock validation)
+    ├── urls.py                            # NEW: Cart + checkout routes
+    ├── admin.py                           # E-commerce admin configuration
+    ├── templates/
+    │   └── products/
+    │       ├── home.html                  # Updated: cart badge, add-to-cart buttons, UI refresh
+    │       ├── product_detail.html        # Updated: add-to-cart form, messages, styling
+    │       ├── cart.html                  # NEW: Cart page w/ quantity update & removal
+    │       └── checkout.html              # NEW: Checkout form + order summary
+    └── README.md                          # Products documentation
