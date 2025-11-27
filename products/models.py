@@ -174,6 +174,30 @@ class Order(models.Model):
         """Calculate total price of the order."""
         return sum(item.get_subtotal() for item in self.items.all()) if self.pk else 0
     
+    def save(self, *args, **kwargs):
+        """Override save to automatically set completed_at timestamp."""
+        from django.utils import timezone
+        
+        # If order is being marked as completed (in_cart changed from True to False)
+        if self.pk:  # Only for existing orders
+            try:
+                old_order = Order.objects.get(pk=self.pk)
+                # If status changed from cart to completed
+                if old_order.in_cart and not self.in_cart and not self.completed_at:
+                    self.completed_at = timezone.now()
+            except Order.DoesNotExist:
+                pass
+        
+        # If creating a new completed order
+        if not self.in_cart and not self.completed_at:
+            self.completed_at = timezone.now()
+        
+        # If order is put back in cart, clear completed_at
+        if self.in_cart and self.completed_at:
+            self.completed_at = None
+        
+        super().save(*args, **kwargs)
+    
     def complete_order(self):
         """
         Complete the order and update stock levels.
