@@ -8,3 +8,4 @@ media/products/images/*.jpg
 media/products/images/*.jpeg
 media/products/images/*.webp
 media/products/images/*.svg
+.python-version

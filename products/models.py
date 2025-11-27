@@ -168,11 +168,11 @@ class Order(models.Model):
     
     def get_total_items(self):
         """Get total number of items in the order."""
-        return sum(item.quantity for item in self.items.all())
+        return sum(item.quantity for item in self.items.all()) if self.pk else 0
     
     def get_total_price(self):
         """Calculate total price of the order."""
-        return sum(item.get_subtotal() for item in self.items.all())
+        return sum(item.get_subtotal() for item in self.items.all()) if self.pk else 0
     
     def complete_order(self):
         """
@@ -242,10 +242,12 @@ class OrderItem(models.Model):
     
     def get_subtotal(self):
         """Calculate subtotal for this order item."""
+        if self.price_at_purchase is None:
+            return 0
         return self.quantity * self.price_at_purchase
     
     def save(self, *args, **kwargs):
         """Override save to set price_at_purchase if not set."""
-        if not self.price_at_purchase:
+        if not self.price_at_purchase and self.product:
             self.price_at_purchase = self.product.price
         super().save(*args, **kwargs)

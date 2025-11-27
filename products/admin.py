@@ -128,7 +128,7 @@ class OrderItemInline(admin.TabularInline):
     
     def subtotal_display(self, obj):
         """Display subtotal for the order item."""
-        if obj.pk:
+        if obj.pk and obj.price_at_purchase is not None:
             return f"৳{obj.get_subtotal():,.2f}"
         return "N/A"
     subtotal_display.short_description = 'Subtotal'
@@ -253,5 +253,7 @@ class OrderItemAdmin(admin.ModelAdmin):
     
     def subtotal_display(self, obj):
         """Display subtotal."""
-        return f"৳{obj.get_subtotal():,.2f}"
+        if obj.price_at_purchase is not None:
+            return f"৳{obj.get_subtotal():,.2f}"
+        return "N/A"
     subtotal_display.short_description = 'Subtotal'
