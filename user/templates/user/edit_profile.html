@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - PookieCare</title>
+    <title>Edit Profile - PookieCare</title>
     <style>
         * {
             margin: 0;
@@ -40,7 +40,7 @@
         }
         .navbar-links {
             display: flex;
-            gap: 30px;
+            gap: 20px;
             align-items: center;
         }
         .navbar-links a {
@@ -56,22 +56,7 @@
             background: #ffe4e1;
             transform: translateY(-2px);
         }
-        @media (max-width: 768px) {
-            .navbar {
-                padding: 15px 20px;
-            }
-            .navbar-brand h1 {
-                font-size: 22px;
-            }
-            .navbar-links {
-                gap: 15px;
-            }
-            .navbar-links a {
-                font-size: 14px;
-                padding: 6px 12px;
-            }
-        }
-        .register-wrapper {
+        .edit-wrapper {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -83,7 +68,7 @@
             padding: 50px 40px;
             border-radius: 15px;
             box-shadow: 0 10px 40px rgba(255, 105, 180, 0.2);
-            max-width: 650px;
+            max-width: 700px;
             width: 100%;
         }
         h1 {
@@ -94,28 +79,28 @@
             font-weight: bold;
         }
         .form-section {
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
         .form-section h3 {
             color: #ff69b4;
             margin-bottom: 15px;
             font-size: 18px;
-            border-bottom: 2px solid #ffb6c1;
-            padding-bottom: 5px;
+            border-bottom: 3px solid #ffb6c1;
+            padding-bottom: 10px;
             font-weight: bold;
         }
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             color: #555;
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 15px;
         }
         input[type="text"],
-        input[type="email"],
-        input[type="password"] {
+        input[type="email"] {
             width: 100%;
             padding: 14px;
             border: 2px solid #ffb6c1;
@@ -129,27 +114,35 @@
             border-color: #ff69b4;
             box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.1);
         }
+        input:disabled {
+            background: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+        }
         .help-text {
             font-size: 12px;
             color: #777;
-            margin-top: 3px;
+            margin-top: 5px;
         }
         .error {
-            color: #e74c3c;
-            font-size: 12px;
-            margin-top: 3px;
-        }
-        .errorlist {
-            list-style: none;
-            color: #e74c3c;
+            color: #dc143c;
             font-size: 12px;
             margin-top: 5px;
         }
+        .errorlist {
+            list-style: none;
+            color: #dc143c;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
         .btn {
-            width: 100%;
+            flex: 1;
             padding: 14px;
-            background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
-            color: white;
             border: none;
             border-radius: 8px;
             font-size: 16px;
@@ -157,33 +150,33 @@
             cursor: pointer;
             transition: all 0.3s;
             font-family: 'Consolas', 'Courier New', monospace;
-            margin-top: 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
         }
-        .btn:hover {
+        .btn-primary {
+            background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+            color: white;
+        }
+        .btn-primary:hover {
             transform: translateY(-3px);
             box-shadow: 0 5px 20px rgba(255, 105, 180, 0.4);
         }
-        .login-link {
-            text-align: center;
-            margin-top: 25px;
-            color: #666;
-            font-size: 15px;
-        }
-        .login-link a {
+        .btn-secondary {
+            background: #ffe4e1;
             color: #ff69b4;
-            text-decoration: none;
-            font-weight: 700;
-            transition: color 0.3s;
+            border: 2px solid #ffb6c1;
         }
-        .login-link a:hover {
-            color: #ff1493;
+        .btn-secondary:hover {
+            background: #ffb6c1;
+            color: white;
         }
         .messages {
             margin-bottom: 20px;
         }
         .alert {
             padding: 12px;
-            border-radius: 5px;
+            border-radius: 8px;
             margin-bottom: 10px;
         }
         .alert-error {
@@ -196,6 +189,34 @@
             color: #228b22;
             border: 2px solid #98fb98;
         }
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px 20px;
+            }
+            .navbar-brand h1 {
+                font-size: 22px;
+            }
+            .navbar-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+            }
+            .navbar-links a {
+                padding: 6px 12px;
+                font-size: 14px;
+            }
+            .container {
+                padding: 30px 20px;
+            }
+            h1 {
+                font-size: 26px;
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
@@ -207,13 +228,17 @@
         <div class="navbar-links">
             <a href="{% url 'products:home' %}">Home</a>
             <a href="{% url 'products:products_list' %}">Products</a>
-            <a href="{% url 'user:login' %}">Login</a>
+            <a href="{% url 'user:profile' %}">Profile</a>
+            {% if user.is_staff %}
+                <a href="/admin/">Admin</a>
+            {% endif %}
+            <a href="{% url 'user:logout' %}">Logout</a>
         </div>
     </nav>
     
-    <div class="register-wrapper">
+    <div class="edit-wrapper">
     <div class="container">
-        <h1>Register</h1>
+        <h1>✏️ Edit Profile</h1>
         
         {% if messages %}
         <div class="messages">
@@ -250,9 +275,9 @@
             <div class="form-section">
                 <h3>Contact Information</h3>
                 <div class="form-group">
-                    <label for="{{ form.email.id_for_label }}">Email Address *</label>
-                    {{ form.email }}
-                    {{ form.email.errors }}
+                    <label>Email Address</label>
+                    <input type="email" value="{{ user.email }}" disabled>
+                    <div class="help-text">Email cannot be changed</div>
                 </div>
                 <div class="form-group">
                     <label for="{{ form.phone_number.id_for_label }}">Phone Number *</label>
@@ -290,28 +315,11 @@
                 </div>
             </div>
             
-            <div class="form-section">
-                <h3>Password</h3>
-                <div class="form-group">
-                    <label for="{{ form.password1.id_for_label }}">Password *</label>
-                    {{ form.password1 }}
-                    <div class="help-text">{{ form.password1.help_text }}</div>
-                    {{ form.password1.errors }}
-                </div>
-                <div class="form-group">
-                    <label for="{{ form.password2.id_for_label }}">Confirm Password *</label>
-                    {{ form.password2 }}
-                    <div class="help-text">{{ form.password2.help_text }}</div>
-                    {{ form.password2.errors }}
-                </div>
+            <div class="btn-group">
+                <a href="{% url 'user:profile' %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">💾 Save Changes</button>
             </div>
-            
-            <button type="submit" class="btn">Register</button>
         </form>
-        
-        <div class="login-link">
-            Already have an account? <a href="{% url 'user:login' %}">Login here</a>
-        </div>
     </div>
     </div>
 </body>

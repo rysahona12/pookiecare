@@ -1,159 +1,150 @@
 # PookieCare - Skincare E-Commerce Platform
 
-A Django-based e-commerce platform for selling skincare products in Bangladesh.
+A modern Django-based e-commerce platform for selling skincare products in Bangladesh with a beautiful baby pink UI theme.
 
-## Project Structure
+## 🎨 Design Features
+
+- **Baby Pink Theme**: Modern gradient design with #ffc0cb, #ffb6c1, #ff69b4, #ff1493
+- **Consolas Font**: Professional monospace typography throughout
+- **Responsive UI**: Full-width sticky navbar, centered product cards
+- **Dynamic Search**: 500ms debounce search with focus preservation
+- **Modern Filters**: Sidebar filters with price range, brand, category
+- **Product Cards**: Fixed 300×480px cards with 2-line name truncation
+
+## 📁 Project Structure
 
 ```
 pookiecare/
 ├── manage.py
 ├── requirements.txt
 ├── README.md
-├── media/                   # User-uploaded files (product images)
+├── TEST_COVERAGE_SUMMARY.md      # Test coverage documentation
+├── db.sqlite3
+├── media/                         # User-uploaded files (product images)
 │   └── products/
 │       └── images/
-├── pookiecare/              # Main project settings
-│   ├── __init__.py
+├── pookiecare/                    # Main project settings
 │   ├── settings.py
 │   ├── urls.py
 │   ├── wsgi.py
 │   └── asgi.py
-├── user/                    # User management application
-│   ├── models.py            # Custom User model
-│   ├── views.py             # Authentication views
-│   ├── forms.py             # Registration forms
-│   ├── admin.py             # Admin configuration
-│   ├── backends.py          # Email authentication backend
-│   └── templates/           # User templates
-└── products/                # Products & orders application
-    ├── models.py            # Product, Brand, Category, Order models
-    ├── admin.py             # E-commerce admin configuration
-    └── README.md            # Products documentation
+├── user/                          # User management application
+│   ├── models.py                  # Custom User model with UUID
+│   ├── views.py                   # Auth & profile views
+│   ├── forms.py                   # Registration & profile edit forms
+│   ├── admin.py                   # Admin configuration
+│   ├── backends.py                # Email authentication backend
+│   ├── tests.py                   # 37 comprehensive tests
+│   ├── urls.py
+│   └── templates/user/
+│       ├── login.html
+│       ├── register.html
+│       ├── profile.html
+│       └── edit_profile.html
+└── products/                      # Products & orders application
+    ├── models.py                  # Product, Brand, Category, Order models
+    ├── views.py                   # Home, products list, product detail
+    ├── admin.py                   # E-commerce admin
+    ├── tests.py                   # 41 comprehensive tests
+    ├── urls.py
+    └── templates/products/
+        ├── home.html              # Featured + latest 10 products
+        ├── products_list.html     # All products with filters/search
+        └── product_detail.html
 ```
 
-## Applications
-
-### User Application
-
-A custom user authentication system with the following features:
-
-- **User Registration** with comprehensive user information
-- **Email-based Authentication** (login with email instead of username)
-- **Bangladeshi Phone Number Validation** (11-digit format: 01XXXXXXXXX)
-- **Address Management** with Bangladesh-specific fields
-- **Admin Panel Integration** for user management
-
-For detailed documentation, see [user/README.md](user/README.md)
-
-### Products Application
-
-A comprehensive e-commerce system for managing skincare products:
-
-- **Brand Management** - Organize products by brands
-- **Category Management** - Categorize skincare products (e.g., Moisturizers, Cleansers, Serums)
-- **Product Catalog** - Complete product information with images, prices, and inventory
-- **Shopping Cart** - Add products to cart with quantity management
-- **Order Management** - Track orders and automatic stock updates
-- **Featured Products** - Highlight products on the homepage
-
-For detailed documentation, see [products/README.md](products/README.md)
-
-## Installation
-
-1. **Clone the repository**:
-   ```bash
-   git clone <repository-url>
-   cd pookiecare
-   ```
-
-2. **Create and activate virtual environment**:
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-   ```
-
-3. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Run migrations**:
-   ```bash
-   python manage.py migrate
-   ```
-
-5. **Create a superuser**:
-   ```bash
-   python manage.py createsuperuser
-   ```
-   
-   You'll need to provide:
-   - Email address
-   - Phone number (e.g., 01999999999)
-   - First name and last name
-   - Full address (house, road, postal code, district)
-   - Password
-
-6. **Run the development server**:
-   ```bash
-   python manage.py runserver
-   ```
-
-7. **Access the application**:
-   - Main site: http://127.0.0.1:8000/
-   - Admin panel: http://127.0.0.1:8000/admin/
-   - User registration: http://127.0.0.1:8000/user/register/
-   - User login: http://127.0.0.1:8000/user/login/
-
-## Features
+## ✨ Key Features
 
 ### User Management
-- ✅ Custom user model with UUID primary key
-- ✅ Email-based authentication
-- ✅ Bangladeshi phone number validation
-- ✅ Comprehensive address fields for delivery
-- ✅ Admin panel integration
-- ✅ User profile page
-- ✅ Registration and login forms
+- ✅ **Custom User Model** with UUID primary key
+- ✅ **Email Authentication** (login with email, not username)
+- ✅ **Bangladeshi Phone Validation** (11-digit format: 01XXXXXXXXX)
+- ✅ **Profile Editing** (all fields except email)
+- ✅ **Address Management** (house, road, postal code, district)
+- ✅ **Full Admin Integration** with custom forms
 
 ### Product Management
-- ✅ Brand and category organization
-- ✅ Product catalog with images
-- ✅ HTML-supported product descriptions
-- ✅ Price management in BDT (৳)
-- ✅ Inventory/stock tracking
-- ✅ Featured products flag
-- ✅ Image storage system
+- ✅ **Brand & Category Organization**
+- ✅ **Product Catalog** with local/external image support
+- ✅ **Featured Products** section (highlighted on homepage)
+- ✅ **Inventory Tracking** with color-coded stock status
+- ✅ **Price Management** in BDT (৳)
+- ✅ **Image Handling** with padding and object-fit: contain
 
-### Shopping & Orders
-- ✅ Shopping cart functionality
-- ✅ Multiple products per order
-- ✅ Quantity management
-- ✅ Price snapshot at purchase time
-- ✅ Automatic stock updates on order completion
-- ✅ Order history tracking
-- ✅ Admin order management tools
+### E-Commerce Features
+- ✅ **Dynamic Search** across product name, brand, category
+- ✅ **Advanced Filtering** by brand, category, price range
+- ✅ **Sort Options** (Latest, Price Low-High, High-Low)
+- ✅ **Shopping Cart System** (orders with in_cart flag)
+- ✅ **Automatic Stock Updates** on order completion
+- ✅ **Order Management** with quantity tracking
 
-### User Fields
-- User ID (Auto-generated UUID)
-- First Name, Middle Name (optional), Last Name
-- Email Address (unique)
-- Phone Number (Bangladeshi format, unique)
-- Address: House Number, Road Number, Postal Code, District
-- Country: Bangladesh (fixed)
-- Password with confirmation
+### UI/UX Features
+- ✅ **Modern Design** with baby pink gradient theme
+- ✅ **Responsive Layout** with sticky navigation
+- ✅ **Product Cards** with fixed sizing and truncation
+- ✅ **Search Bar** with dynamic submission and focus preservation
+- ✅ **Sidebar Filters** with dropdown selects
+- ✅ **Stock Badges** (green/orange/red indicators)
 
-## Technology Stack
+## 🚀 Quick Start
+
+### 1. Setup Environment
+```bash
+# Clone and navigate
+git clone https://github.com/rysahona12/pookiecare.git
+cd pookiecare
+
+# Create virtual environment
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run migrations
+python manage.py migrate
+```
+
+### 2. Create Superuser
+```bash
+python manage.py createsuperuser
+```
+Provide: email, phone (01XXXXXXXXX), name, address, password
+
+### 3. Run Server
+```bash
+python manage.py runserver
+```
+
+### 4. Access Application
+- 🏠 **Home**: http://127.0.0.1:8000/
+- 🔐 **Login**: http://127.0.0.1:8000/user/login/
+- 📝 **Register**: http://127.0.0.1:8000/user/register/
+- 👤 **Profile**: http://127.0.0.1:8000/user/profile/
+- 🛍️ **Products**: http://127.0.0.1:8000/products/
+- ⚙️ **Admin**: http://127.0.0.1:8000/admin/
+
+## 📊 Testing
+
+### Run All Tests (78 tests)
+```bash
+python manage.py test              # All tests
+python manage.py test user.tests   # User tests (37)
+python manage.py test products.tests  # Products tests (41)
+```
+
+See `TEST_COVERAGE_SUMMARY.md` for detailed test documentation.
+
+## 🛠️ Technology Stack
 
 - **Framework**: Django 5.2.7
 - **Database**: SQLite3 (development)
-- **Python**: 3.x
+- **Python**: 3.13.7
 - **Image Processing**: Pillow 11.0.0
-- **Authentication**: Custom email-based authentication
+- **Authentication**: Custom email-based backend
 
-## Configuration
-
-### Settings
+## ⚙️ Configuration
 
 Key settings in `pookiecare/settings.py`:
 
@@ -161,113 +152,129 @@ Key settings in `pookiecare/settings.py`:
 # Custom User Model
 AUTH_USER_MODEL = 'user.User'
 
-# Authentication Backends
+# Email Authentication
 AUTHENTICATION_BACKENDS = [
     'user.backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-# Login/Logout URLs
+# URLs
 LOGIN_URL = 'user:login'
-LOGIN_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = 'products:home'
 LOGOUT_REDIRECT_URL = 'user:login'
+
+# Media Files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 ```
 
-## Development
+## 📱 Pages Overview
 
-### Running Tests
-```bash
-python manage.py test
-```
+### Public Pages
+- **Home** (`/`): Featured products (6) + Latest 10 products
+- **Products List** (`/products/`): All products with search/filters/sort
+- **Product Detail** (`/product/<id>/`): Full product info + related products
+- **Register** (`/user/register/`): User registration form
+- **Login** (`/user/login/`): Email-based authentication
 
-### Creating Migrations
-```bash
-python manage.py makemigrations
-```
+### Authenticated Pages
+- **Profile** (`/user/profile/`): View user information
+- **Edit Profile** (`/user/profile/edit/`): Update personal info (except email)
 
-### Applying Migrations
-```bash
-python manage.py migrate
-```
+### Admin Panel (`/admin/`)
+- User management with custom forms
+- Brand & Category management
+- Product catalog with image previews
+- Order management with stock validation
+- Color-coded status indicators
 
-### Collecting Static Files
-```bash
-python manage.py collectstatic
-```
+## 🔒 Security Features
 
-## Admin Panel
+- ✅ CSRF protection on all forms
+- ✅ Secure password hashing (Django's PBKDF2)
+- ✅ UUID primary keys (non-sequential)
+- ✅ Email & phone uniqueness validation
+- ✅ Phone format validation (regex)
+- ✅ Login required decorators
+- ✅ Session-based authentication
 
-Access the admin panel at `/admin/` to manage:
+## 📝 Data Models
 
-### User Management
-- Users (view, create, edit, delete)
-- User permissions and groups
-- Custom user creation form with password confirmation
-- Search and filter by email, name, phone, district
+### User Model
+- UUID primary key
+- Email (unique, used for login)
+- Phone (11-digit Bangladeshi format)
+- Name fields (first, middle, last)
+- Address (house, road, postal code, district)
+- Fixed country: Bangladesh
 
-### Product Management
-- Brands and categories
-- Products with image previews
-- Color-coded stock status (Red: Out of Stock, Orange: Low Stock, Green: In Stock)
-- Price display in BDT (৳)
-- Featured products management
+### Product Models
+- **Brand**: UUID, brand name
+- **Category**: UUID, category name
+- **Product**: UUID, name, image, brand, category, price, stock, featured flag
+- **Order**: UUID, user FK, in_cart flag, timestamps
+- **OrderItem**: UUID, order FK, product FK, quantity, price snapshot
 
-### Order Management
-- View all orders (cart and completed)
-- Color-coded order status (🛒 In Cart, ✓ Completed)
-- Inline order items editing
-- Automatic stock validation
-- Bulk order completion actions
-- Order history and analytics
+### Key Methods
+- `Product.is_in_stock()` - Check availability
+- `Product.get_stock_status()` - Status message
+- `Order.get_total_items()` - Total quantity
+- `Order.get_total_price()` - Total cost
+- `Order.complete_order()` - Process & update stock
+- `OrderItem.get_subtotal()` - Line item total
 
-## Security Features
+## 🎯 Validation Rules
 
-- CSRF protection on all forms
-- Password hashing using Django's secure hasher
-- Email and phone number uniqueness validation
-- Bangladeshi phone number format validation
-- Session-based authentication
+### Phone Number
+- **Format**: 01XXXXXXXXX
+- **Length**: Exactly 11 digits
+- **Prefix**: Must start with "01"
+- **Characters**: Digits only
+- **Examples**: 
+  - ✅ 01712345678
+  - ✅ 01812345678
+  - ❌ +8801712345678 (includes country code)
+  - ❌ 1712345678 (missing 0)
+  - ❌ 0171234567 (only 10 digits)
 
-## Future Enhancements
+### Product Images
+- Stored in: `media/products/images/`
+- Supports: local uploads & external URLs
+- Display: object-fit: contain with padding
+- Formats: JPEG, PNG, GIF, WebP
 
-### User Features
-- [ ] Password reset functionality
-- [ ] Email verification
-- [ ] User profile editing
-- [ ] Order history page for users
+## 🔮 Future Enhancements
+
+### Planned Features
+- [ ] Password reset via email
+- [ ] Email verification on registration
+- [ ] Order history for customers
+- [ ] Shopping cart UI
+- [ ] Checkout flow
+- [ ] Payment gateway (bKash, Nagad, SSL Commerz)
+- [ ] Product reviews & ratings
 - [ ] Wishlist functionality
-
-### E-Commerce Features
-- [ ] Product search and filtering
-- [ ] Product reviews and ratings
-- [ ] Payment gateway integration
-- [ ] Order tracking
-- [ ] Discount codes and promotions
-- [ ] Product recommendations
-- [ ] Public-facing product pages
-- [ ] Checkout process
-
-### Technical
-- [ ] API endpoints for mobile app
-- [ ] Email notifications for orders
-- [ ] SMS notifications (Bangladesh)
+- [ ] Discount codes
+- [ ] Email/SMS notifications
 - [ ] Advanced analytics dashboard
+- [ ] REST API for mobile apps
 
-## Contributing
+## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+2. Create feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## Notes
+## 📄 License
 
-- This platform is specifically designed for Bangladesh market
-- Phone numbers must follow the format: 01XXXXXXXXX (11 digits)
-- Country field is fixed to "Bangladesh"
-- All prices are in BDT (Bangladeshi Taka - ৳)
-- Product images are stored locally in `media/products/images/`
-- All primary keys use UUID for better security and scalability
-- Shopping cart is implemented as orders with `in_cart=True`
-- Stock is automatically updated when orders are completed
+This project is for educational purposes.
+
+## 📧 Contact
+
+Repository: [rysahona12/pookiecare](https://github.com/rysahona12/pookiecare)
+
+---
+
+**Note**: This platform is specifically designed for the Bangladesh market with localized features (phone format, BDT currency, Bangladesh-only shipping).

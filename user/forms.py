@@ -3,6 +3,76 @@ from django.contrib.auth.forms import UserCreationForm as BaseUserCreationForm
 from .models import User
 
 
+class UserProfileEditForm(forms.ModelForm):
+    """Form for editing user profile information."""
+    
+    first_name = forms.CharField(
+        max_length=100,
+        required=True,
+        widget=forms.TextInput(attrs={'placeholder': 'First Name'})
+    )
+    middle_name = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'Middle Name (Optional)'})
+    )
+    last_name = forms.CharField(
+        max_length=100,
+        required=True,
+        widget=forms.TextInput(attrs={'placeholder': 'Last Name'})
+    )
+    phone_number = forms.CharField(
+        max_length=11,
+        required=True,
+        widget=forms.TextInput(attrs={'placeholder': '01XXXXXXXXX'}),
+        help_text='Enter 11-digit Bangladeshi phone number (e.g., 01999999999)'
+    )
+    house_number = forms.CharField(
+        max_length=50,
+        required=True,
+        widget=forms.TextInput(attrs={'placeholder': 'House Number'})
+    )
+    road_number = forms.CharField(
+        max_length=50,
+        required=True,
+        widget=forms.TextInput(attrs={'placeholder': 'Road Number'})
+    )
+    postal_code = forms.CharField(
+        max_length=10,
+        required=True,
+        widget=forms.TextInput(attrs={'placeholder': 'Postal Code'})
+    )
+    district = forms.CharField(
+        max_length=100,
+        required=True,
+        widget=forms.TextInput(attrs={'placeholder': 'District'})
+    )
+    
+    class Meta:
+        model = User
+        fields = (
+            'first_name', 'middle_name', 'last_name',
+            'phone_number',
+            'house_number', 'road_number', 'postal_code', 'district'
+        )
+    
+    def clean_phone_number(self):
+        """Validate phone number format."""
+        phone_number = self.cleaned_data.get('phone_number')
+        if phone_number:
+            phone_number = phone_number.replace(' ', '').replace('-', '')
+            
+            if not phone_number.startswith('01') or len(phone_number) != 11:
+                raise forms.ValidationError(
+                    'Phone number must be 11 digits starting with 01 (e.g., 01999999999)'
+                )
+            
+            if not phone_number.isdigit():
+                raise forms.ValidationError('Phone number must contain only digits')
+        
+        return phone_number
+
+
 class UserRegistrationForm(BaseUserCreationForm):
     """Form for user registration with all required fields."""
     
