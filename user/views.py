@@ -58,3 +58,22 @@ def profile_view(request):
     """Display user profile."""
     return render(request, 'user/profile.html', {'user': request.user})
 
+
+@login_required
+def edit_profile_view(request):
+    """Handle user profile editing."""
+    from .forms import UserProfileEditForm
+    
+    if request.method == 'POST':
+        form = UserProfileEditForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile updated successfully!')
+            return redirect('user:profile')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = UserProfileEditForm(instance=request.user)
+    
+    return render(request, 'user/edit_profile.html', {'form': form})
+
