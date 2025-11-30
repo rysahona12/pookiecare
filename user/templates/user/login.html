@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - PookieCare</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Consolas', 'Courier New', monospace;
+            background: linear-gradient(135deg, #ffc0cb 0%, #ffb6c1 100%);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: white;
+            padding: 20px 60px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        .navbar-brand h1 {
+            color: #ff69b4;
+            font-size: 28px;
+            margin: 0;
+            font-weight: bold;
+        }
+        .navbar-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        .navbar-links a {
+            color: #ff69b4;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .navbar-links a:hover {
+            background: #ffe4e1;
+            transform: translateY(-2px);
+        }
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+            }
+            .navbar-brand h1 {
+                font-size: 22px;
+            }
+            .navbar-links {
+                gap: 15px;
+            }
+            .navbar-links a {
+                font-size: 14px;
+                padding: 6px 12px;
+            }
+        }
+        .login-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 80px);
+            padding: 40px 20px;
+        }
+        .container {
+            background: white;
+            padding: 50px 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(255, 105, 180, 0.2);
+            max-width: 450px;
+            width: 100%;
+        }
+        h1 {
+            color: #ff69b4;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #ffb6c1;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            transition: all 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #ff69b4;
+            box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.1);
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Consolas', 'Courier New', monospace;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(255, 105, 180, 0.4);
+        }
+        .register-link {
+            text-align: center;
+            margin-top: 25px;
+            color: #666;
+            font-size: 15px;
+        }
+        .register-link a {
+            color: #ff69b4;
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.3s;
+        }
+        .register-link a:hover {
+            color: #ff1493;
+        }
+        .messages {
+            margin-bottom: 20px;
+        }
+        .alert {
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .alert-error {
+            background-color: #ffe4e1;
+            color: #dc143c;
+            border: 2px solid #ffb6c1;
+        }
+        .alert-success {
+            background-color: #f0fff0;
+            color: #228b22;
+            border: 2px solid #98fb98;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{% url 'products:home' %}" class="navbar-brand">
+            <span style="font-size: 32px;">🧴</span>
+            <h1>PookieCare</h1>
+        </a>
+        <div class="navbar-links">
+            <a href="{% url 'products:home' %}">Home</a>
+            <a href="{% url 'products:products_list' %}">Products</a>
+            <a href="{% url 'user:register' %}">Register</a>
+        </div>
+    </nav>
+    
+    <div class="login-wrapper">
+    <div class="container">
+        <h1>Login</h1>
+        
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <button type="submit" class="btn">Login</button>
+        </form>
+        
+        <div class="register-link">
+            Don't have an account? <a href="{% url 'user:register' %}">Register here</a>
+        </div>
+    </div>
+    </div>
+</body>
+</html>

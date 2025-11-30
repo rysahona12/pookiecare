@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.product_name }} - PookieCare</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Consolas', 'Courier New', monospace;
+            background: linear-gradient(135deg, #ffc0cb 0%, #ffb6c1 100%);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: white;
+            padding: 20px 60px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        .navbar-brand h1 {
+            color: #ff69b4;
+            font-size: 28px;
+            margin: 0;
+            font-weight: bold;
+        }
+        .navbar-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .navbar-links a {
+            color: #ff69b4;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .navbar-links a:hover {
+            background: #ffe4e1;
+            transform: translateY(-2px);
+        }
+        .content-wrapper {
+            padding: 40px 60px;
+        }
+        .container {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(255, 105, 180, 0.2);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .back-link {
+            color: #ff69b4;
+            text-decoration: none;
+            margin-bottom: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            padding: 10px 20px;
+            border-radius: 20px;
+        }
+        .back-link:hover {
+            background: #ffe4e1;
+            transform: translateX(-5px);
+        }
+        .product-detail {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        .product-image-container {
+            background: #fff;
+            border: 3px solid #ffe4e1;
+            border-radius: 20px;
+            overflow: hidden;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 20px rgba(255, 105, 180, 0.15);
+            padding: 30px;
+        }
+        .product-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .product-image-container .no-image {
+            color: #ffb6c1;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .product-info h1 {
+            color: #333;
+            font-size: 36px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            line-height: 1.3;
+        }
+        .product-brand {
+            color: #ff69b4;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .product-category {
+            color: #666;
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+        .product-price {
+            font-size: 48px;
+            font-weight: bold;
+            color: #ff69b4;
+            margin-bottom: 20px;
+        }
+        .product-stock {
+            font-size: 16px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .stock-in {
+            background: #d4edda;
+            color: #155724;
+        }
+        .stock-low {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .stock-out {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .featured-badge {
+            background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%);
+            color: #333;
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+        .product-details {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 3px solid #ffe4e1;
+        }
+        .product-details h2 {
+            color: #ff69b4;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .product-details-content {
+            color: #555;
+            line-height: 1.6;
+        }
+        .related-section {
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 3px solid #ffe4e1;
+        }
+        .related-section h2 {
+            color: #ff69b4;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+        }
+        .product-card {
+            background: #fff;
+            border: 2px solid #ffe4e1;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 3px 15px rgba(255, 105, 180, 0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 30px rgba(255, 105, 180, 0.3);
+            border-color: #ff69b4;
+        }
+        .product-card-image {
+            width: 100%;
+            height: 200px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            padding: 15px;
+        }
+        .product-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .product-card-info {
+            padding: 15px;
+        }
+        .product-card-brand {
+            color: #ff69b4;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+        .product-card-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            min-height: 40px;
+        }
+        .product-card-price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff69b4;
+        }
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px 20px;
+            }
+            .navbar-brand h1 {
+                font-size: 22px;
+            }
+            .navbar-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+            }
+            .navbar-links a {
+                padding: 6px 12px;
+                font-size: 14px;
+            }
+            .content-wrapper {
+                padding: 20px;
+            }
+            .container {
+                padding: 20px;
+            }
+            .product-detail {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .product-image-container {
+                height: 300px;
+            }
+            .product-info h1 {
+                font-size: 24px;
+            }
+            .product-price {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{% url 'products:home' %}" class="navbar-brand">
+            <span style="font-size: 32px;">🧴</span>
+            <h1>PookieCare</h1>
+        </a>
+        <div class="navbar-links">
+            <a href="{% url 'products:home' %}">Home</a>
+            <a href="{% url 'products:products_list' %}">Products</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'user:profile' %}">Profile</a>
+                {% if user.is_staff %}
+                    <a href="/admin/">Admin</a>
+                {% endif %}
+                <a href="{% url 'user:logout' %}">Logout</a>
+            {% else %}
+                <a href="{% url 'user:login' %}">Login</a>
+                <a href="{% url 'user:register' %}">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="content-wrapper">
+    <div class="container">
+        <a href="{% url 'products:home' %}" class="back-link">← Back to Products</a>
+        
+        <div class="product-detail">
+            <div class="product-image-container">
+                {% if product.get_image_url %}
+                    <img src="{{ product.get_image_url }}" alt="{{ product.product_name }}">
+                {% else %}
+                    <span class="no-image">No Image Available</span>
+                {% endif %}
+            </div>
+            
+            <div class="product-info">
+                {% if product.featured %}
+                <div class="featured-badge">⭐ Featured Product</div>
+                {% endif %}
+                
+                <div class="product-brand">{{ product.brand.brand_name }}</div>
+                <h1>{{ product.product_name }}</h1>
+                <div class="product-category">{{ product.category.category_name }}</div>
+                
+                <div class="product-price">৳{{ product.price|floatformat:2 }}</div>
+                
+                <span class="product-stock {% if product.available_stock == 0 %}stock-out{% elif product.available_stock < 10 %}stock-low{% else %}stock-in{% endif %}">
+                    {{ product.get_stock_status }}
+                </span>
+                
+                <div class="product-details">
+                    <h2>Product Details</h2>
+                    <div class="product-details-content">
+                        {{ product.product_details|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% if related_products %}
+        <div class="related-section">
+            <h2>Related Products</h2>
+            <div class="products-grid">
+                {% for related in related_products %}
+                <a href="{% url 'products:product_detail' related.product_id %}" style="text-decoration: none; color: inherit;">
+                    <div class="product-card">
+                        <div class="product-card-image">
+                            {% if related.get_image_url %}
+                                <img src="{{ related.get_image_url }}" alt="{{ related.product_name }}">
+                            {% else %}
+                                <span>No Image</span>
+                            {% endif %}
+                        </div>
+                        <div class="product-card-info">
+                            <div class="product-card-brand">{{ related.brand.brand_name }}</div>
+                            <div class="product-card-name">{{ related.product_name }}</div>
+                            <div class="product-card-price">৳{{ related.price|floatformat:2 }}</div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    </div>
+</body>
+</html>

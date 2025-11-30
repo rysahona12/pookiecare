@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile - PookieCare</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Consolas', 'Courier New', monospace;
+            background: linear-gradient(135deg, #ffc0cb 0%, #ffb6c1 100%);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: white;
+            padding: 20px 60px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        .navbar-brand h1 {
+            color: #ff69b4;
+            font-size: 28px;
+            margin: 0;
+            font-weight: bold;
+        }
+        .navbar-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .navbar-links a {
+            color: #ff69b4;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .navbar-links a:hover {
+            background: #ffe4e1;
+            transform: translateY(-2px);
+        }
+        .edit-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 80px);
+            padding: 40px 20px;
+        }
+        .container {
+            background: white;
+            padding: 50px 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(255, 105, 180, 0.2);
+            max-width: 700px;
+            width: 100%;
+        }
+        h1 {
+            color: #ff69b4;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+        }
+        .form-section {
+            margin-bottom: 30px;
+        }
+        .form-section h3 {
+            color: #ff69b4;
+            margin-bottom: 15px;
+            font-size: 18px;
+            border-bottom: 3px solid #ffb6c1;
+            padding-bottom: 10px;
+            font-weight: bold;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 15px;
+        }
+        input[type="text"],
+        input[type="email"] {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #ffb6c1;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            transition: all 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #ff69b4;
+            box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.1);
+        }
+        input:disabled {
+            background: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+        }
+        .help-text {
+            font-size: 12px;
+            color: #777;
+            margin-top: 5px;
+        }
+        .error {
+            color: #dc143c;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        .errorlist {
+            list-style: none;
+            color: #dc143c;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Consolas', 'Courier New', monospace;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(255, 105, 180, 0.4);
+        }
+        .btn-secondary {
+            background: #ffe4e1;
+            color: #ff69b4;
+            border: 2px solid #ffb6c1;
+        }
+        .btn-secondary:hover {
+            background: #ffb6c1;
+            color: white;
+        }
+        .messages {
+            margin-bottom: 20px;
+        }
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .alert-error {
+            background-color: #ffe4e1;
+            color: #dc143c;
+            border: 2px solid #ffb6c1;
+        }
+        .alert-success {
+            background-color: #f0fff0;
+            color: #228b22;
+            border: 2px solid #98fb98;
+        }
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px 20px;
+            }
+            .navbar-brand h1 {
+                font-size: 22px;
+            }
+            .navbar-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+            }
+            .navbar-links a {
+                padding: 6px 12px;
+                font-size: 14px;
+            }
+            .container {
+                padding: 30px 20px;
+            }
+            h1 {
+                font-size: 26px;
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{% url 'products:home' %}" class="navbar-brand">
+            <span style="font-size: 32px;">🧴</span>
+            <h1>PookieCare</h1>
+        </a>
+        <div class="navbar-links">
+            <a href="{% url 'products:home' %}">Home</a>
+            <a href="{% url 'products:products_list' %}">Products</a>
+            <a href="{% url 'user:profile' %}">Profile</a>
+            {% if user.is_staff %}
+                <a href="/admin/">Admin</a>
+            {% endif %}
+            <a href="{% url 'user:logout' %}">Logout</a>
+        </div>
+    </nav>
+    
+    <div class="edit-wrapper">
+    <div class="container">
+        <h1>✏️ Edit Profile</h1>
+        
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-section">
+                <h3>Personal Information</h3>
+                <div class="form-group">
+                    <label for="{{ form.first_name.id_for_label }}">First Name *</label>
+                    {{ form.first_name }}
+                    {{ form.first_name.errors }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.middle_name.id_for_label }}">Middle Name (Optional)</label>
+                    {{ form.middle_name }}
+                    {{ form.middle_name.errors }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.last_name.id_for_label }}">Last Name *</label>
+                    {{ form.last_name }}
+                    {{ form.last_name.errors }}
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3>Contact Information</h3>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" value="{{ user.email }}" disabled>
+                    <div class="help-text">Email cannot be changed</div>
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.phone_number.id_for_label }}">Phone Number *</label>
+                    {{ form.phone_number }}
+                    <div class="help-text">{{ form.phone_number.help_text }}</div>
+                    {{ form.phone_number.errors }}
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3>Address</h3>
+                <div class="form-group">
+                    <label for="{{ form.house_number.id_for_label }}">House Number *</label>
+                    {{ form.house_number }}
+                    {{ form.house_number.errors }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.road_number.id_for_label }}">Road Number *</label>
+                    {{ form.road_number }}
+                    {{ form.road_number.errors }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.postal_code.id_for_label }}">Postal Code *</label>
+                    {{ form.postal_code }}
+                    {{ form.postal_code.errors }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.district.id_for_label }}">District *</label>
+                    {{ form.district }}
+                    {{ form.district.errors }}
+                </div>
+                <div class="form-group">
+                    <label>Country</label>
+                    <input type="text" value="Bangladesh" disabled>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <a href="{% url 'user:profile' %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+            </div>
+        </form>
+    </div>
+    </div>
+</body>
+</html>

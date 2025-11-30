@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PookieCare - Skincare Products</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Consolas', 'Courier New', monospace;
+            background: linear-gradient(135deg, #ffc0cb 0%, #ffb6c1 100%);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: white;
+            padding: 20px 60px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        .navbar-brand h1 {
+            color: #ff69b4;
+            font-size: 28px;
+            margin: 0;
+            font-weight: bold;
+        }
+        .navbar-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .navbar-links a {
+            color: #ff69b4;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .navbar-links a:hover {
+            background: #ffe4e1;
+            transform: translateY(-2px);
+        }
+        .content-wrapper {
+            padding: 30px 60px;
+        }
+        .section {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(255, 105, 180, 0.15);
+            margin-bottom: 30px;
+        }
+        .section h2 {
+            color: #ff69b4;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: bold;
+            border-bottom: 3px solid #ffb6c1;
+            padding-bottom: 10px;
+        }
+        .products-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+        .product-card {
+            background: #fff;
+            border: 2px solid #ffe4e1;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 3px 15px rgba(255, 105, 180, 0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+            width: 300px;
+            height: 480px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 30px rgba(255, 105, 180, 0.3);
+            border-color: #ff69b4;
+        }
+        .product-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            padding: 15px;
+        }
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .product-info {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-brand {
+            color: #ff69b4;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+        .product-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            max-height: 50.4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .product-category {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+        .product-price {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff69b4;
+            margin-bottom: 10px;
+        }
+        .product-stock {
+            font-size: 14px;
+            padding: 6px 12px;
+            border-radius: 5px;
+            display: inline-block;
+            width: fit-content;
+        }
+        .stock-in {
+            background: #d4edda;
+            color: #155724;
+        }
+        .stock-low {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .stock-out {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .featured-badge {
+            background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%);
+            color: #333;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+        }
+        .no-products {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        .no-products h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .no-products p {
+            font-size: 16px;
+        }
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px 20px;
+            }
+            .navbar-brand h1 {
+                font-size: 22px;
+            }
+            .navbar-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+            }
+            .navbar-links a {
+                padding: 6px 12px;
+                font-size: 14px;
+            }
+            .content-wrapper {
+                padding: 20px;
+            }
+            .section {
+                padding: 20px;
+            }
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{% url 'products:home' %}" class="navbar-brand">
+            <span style="font-size: 32px;">🧴</span>
+            <h1>PookieCare</h1>
+        </a>
+        <div class="navbar-links">
+            <a href="{% url 'products:home' %}">Home</a>
+            <a href="{% url 'products:products_list' %}">Products</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'user:profile' %}">Profile</a>
+                {% if user.is_staff %}
+                    <a href="/admin/">Admin</a>
+                {% endif %}
+                <a href="{% url 'user:logout' %}">Logout</a>
+            {% else %}
+                <a href="{% url 'user:login' %}">Login</a>
+                <a href="{% url 'user:register' %}">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="content-wrapper">
+    {% if featured_products %}
+    <div class="section">
+        <h2>⭐ Featured Products</h2>
+        <div class="products-grid">
+            {% for product in featured_products %}
+            <a href="{% url 'products:product_detail' product.product_id %}" style="text-decoration: none; color: inherit;">
+                <div class="product-card">
+                    <div class="product-image">
+                        {% if product.get_image_url %}
+                            <img src="{{ product.get_image_url }}" alt="{{ product.product_name }}">
+                        {% else %}
+                            <span>No Image</span>
+                        {% endif %}
+                    </div>
+                    <div class="product-info">
+                        <div class="product-brand">{{ product.brand.brand_name }}</div>
+                        <div class="product-name">{{ product.product_name }}</div>
+                        <div class="product-category">{{ product.category.category_name }}</div>
+                        <div class="product-price">৳{{ product.price|floatformat:2 }}</div>
+                        <span class="product-stock {% if product.available_stock == 0 %}stock-out{% elif product.available_stock < 10 %}stock-low{% else %}stock-in{% endif %}">
+                            {{ product.get_stock_status }}
+                        </span>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="section">
+        <h2>🆕 Latest Products</h2>
+        {% if products %}
+        <div class="products-grid">
+            {% for product in products %}
+            <a href="{% url 'products:product_detail' product.product_id %}" style="text-decoration: none; color: inherit;">
+                <div class="product-card">
+                    <div class="product-image">
+                        {% if product.get_image_url %}
+                            <img src="{{ product.get_image_url }}" alt="{{ product.product_name }}">
+                        {% else %}
+                            <span>No Image</span>
+                        {% endif %}
+                    </div>
+                    <div class="product-info">
+                        <div class="product-brand">{{ product.brand.brand_name }}</div>
+                        <div class="product-name">{{ product.product_name }}</div>
+                        <div class="product-category">{{ product.category.category_name }}</div>
+                        <div class="product-price">৳{{ product.price|floatformat:2 }}</div>
+                        <span class="product-stock {% if product.available_stock == 0 %}stock-out{% elif product.available_stock < 10 %}stock-low{% else %}stock-in{% endif %}">
+                            {{ product.get_stock_status }}
+                        </span>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-products">
+            <h3>No Products Found</h3>
+            <p>Try adjusting your filters or check back later.</p>
+        </div>
+        {% endif %}
+    </div>
+    </div>
+</body>
+</html>

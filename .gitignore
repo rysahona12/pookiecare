@@ -1,0 +1,17 @@
+.venv/
+pookiecare/__pycache__/
+user/__pycache__/
+products/__pycache__/
+*.pyc
+db.sqlite3
+media/products/images/*.png
+media/products/images/*.jpg
+media/products/images/*.jpeg
+media/products/images/*.webp
+media/products/images/*.svg
+.python-version
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
