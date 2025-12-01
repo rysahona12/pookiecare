@@ -166,3 +166,46 @@ def cart_view(request):
     )
 
 
+@login_required
+def update_cart_item_view(request, order_item_id):
+    """Update the quantity of a cart item or remove it if quantity < 1."""
+    order_item = get_object_or_404(
+        OrderItem,
+        order_item_id=order_item_id,
+        order__user=request.user,
+        order__in_cart=True,
+    )
+
+    try:
+        quantity = int(request.POST.get('quantity', 1))
+    except (TypeError, ValueError):
+        quantity = 1
+
+    if quantity < 1:
+        order_item.delete()
+        messages.success(request, "Item removed from your cart.")
+        return redirect('products:cart')
+
+    if quantity > order_item.product.available_stock:
+        messages.error(request, "Requested quantity exceeds available stock.")
+        return redirect('products:cart')
+
+    order_item.quantity = quantity
+    order_item.save()
+    messages.success(request, "Cart updated.")
+    return redirect('products:cart')
+
+
+@login_required
+def remove_from_cart_view(request, order_item_id):
+    """Remove an item from the cart."""
+    order_item = get_object_or_404(
+        OrderItem,
+        order_item_id=order_item_id,
+        order__user=request.user,
+        order__in_cart=True,
+    )
+    order_item.delete()
+    messages.success(request, "Item removed from your cart.")
+    return redirect('products:cart')
+
