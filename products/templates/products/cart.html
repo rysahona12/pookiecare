@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart - PookieCare</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .header {
+            background: white;
+            padding: 20px 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .header h1 { color: #667eea; font-size: 32px; }
+        .header-links { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+        .header-links a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            transition: background 0.3s, color 0.3s;
+            background: #f2f4ff;
+            font-weight: 600;
+        }
+        .header-links a:hover { background: #e0e5ff; }
+        .header-links .cart-link { background: #667eea; color: #fff; }
+        .header-links .cart-link:hover { background: #5568d3; }
+
+        .messages { max-width: 1200px; margin: 0 auto 15px auto; }
+        .message {
+            background: #fff;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            color: #333;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .cart-header h2 { color: #667eea; }
+        .cart-actions a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f7f7ff; color: #555; }
+        td img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; }
+        .qty-form { display: inline-flex; gap: 8px; align-items: center; }
+        .qty-form input[type="number"] {
+            width: 70px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        .btn {
+            padding: 10px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .btn-primary { background: #667eea; color: #fff; }
+        .btn-primary:hover { background: #5568d3; }
+        .btn-ghost { background: #f2f4ff; color: #555; }
+        .btn-danger { background: #fbe4e6; color: #b00020; }
+        .summary {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .summary-total { font-size: 20px; font-weight: 700; color: #333; }
+        .empty { text-align: center; padding: 40px 20px; color: #666; }
+
+        @media (max-width: 768px) {
+            .header { flex-direction: column; align-items: flex-start; }
+            table { display: block; overflow-x: auto; }
+            th, td { white-space: nowrap; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="{% url 'products:home' %}" style="text-decoration: none;">
+            <h1>PookieCare</h1>
+        </a>
+        <div class="header-links">
+            <a href="{% url 'products:home' %}">Home</a>
+            <a href="{% url 'products:cart' %}" class="cart-link">Cart</a>
+            <a href="{% url 'products:checkout' %}">Checkout</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'user:profile' %}">Profile</a>
+                {% if user.is_staff %}
+                    <a href="/admin/">Admin</a>
+                {% endif %}
+                <a href="{% url 'user:logout' %}">Logout</a>
+            {% else %}
+                <a href="{% url 'user:login' %}">Login</a>
+                <a href="{% url 'user:register' %}">Register</a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="message">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="container">
+        <div class="cart-header">
+            <h2>Your Cart</h2>
+            <div class="cart-actions">
+                <a href="{% url 'products:home' %}">Continue shopping</a>
+            </div>
+        </div>
+
+        {% if items %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Price (BDT)</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>
+                        <div style="display:flex; gap:12px; align-items:center;">
+                            {% if item.product.get_image_url %}
+                                <img src="{{ item.product.get_image_url }}" alt="{{ item.product.product_name }}">
+                            {% else %}
+                                <div style="width:80px; height:80px; background:#eee; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#999;">No Image</div>
+                            {% endif %}
+                            <div>
+                                <div style="font-weight:700; color:#333;">{{ item.product.product_name }}</div>
+                                <div style="color:#666; font-size:13px;">{{ item.product.brand.brand_name }} • {{ item.product.category.category_name }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ item.price_at_purchase }}</td>
+                    <td>
+                        <form class="qty-form" method="post" action="{% url 'products:update_cart_item' item.order_item_id %}">
+                            {% csrf_token %}
+                            <input type="number" name="quantity" min="1" max="{{ item.product.available_stock }}" value="{{ item.quantity }}">
+                            <button class="btn btn-ghost" type="submit">Update</button>
+                        </form>
+                    </td>
+                    <td>{{ item.get_subtotal|floatformat:2 }}</td>
+                    <td>
+                        <form method="post" action="{% url 'products:remove_cart_item' item.order_item_id %}">
+                            {% csrf_token %}
+                            <button class="btn btn-danger" type="submit">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="summary">
+            <div class="summary-total">Total: BDT {{ total_price|floatformat:2 }}</div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <a href="{% url 'products:home' %}" class="btn btn-ghost" style="text-decoration:none; display:inline-block;">Add more items</a>
+                <a href="{% url 'products:checkout' %}" class="btn btn-primary" style="text-decoration:none; display:inline-block;">Proceed to Checkout</a>
+            </div>
+        </div>
+        {% else %}
+            <div class="empty">
+                <p>Your cart is empty.</p>
+                <a href="{% url 'products:home' %}" style="color:#fff; background:#667eea; padding:10px 16px; border-radius:8px; text-decoration:none; font-weight:700;">Browse products</a>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
