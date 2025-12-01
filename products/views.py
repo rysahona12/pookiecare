@@ -209,3 +209,60 @@ def remove_from_cart_view(request, order_item_id):
     messages.success(request, "Item removed from your cart.")
     return redirect('products:cart')
 
+
+@login_required
+def checkout_view(request):
+    """Display order form and complete the order."""
+    cart = (
+        Order.objects.filter(user=request.user, in_cart=True)
+        .prefetch_related('items__product')
+        .first()
+    )
+
+    if not cart or cart.get_total_items() == 0:
+        messages.info(request, "Your cart is empty.")
+        return redirect('products:home')
+
+    user = request.user
+    initial_data = {
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'phone_number': user.phone_number,
+        'house_number': user.house_number,
+        'road_number': user.road_number,
+        'postal_code': user.postal_code,
+        'district': user.district,
+    }
+
+    if request.method == 'POST':
+        form = CheckoutForm(request.POST, initial=initial_data)
+        if form.is_valid():
+            # Update user's shipping/contact info for reuse
+            user.first_name = form.cleaned_data['first_name']
+            user.last_name = form.cleaned_data['last_name']
+            user.phone_number = form.cleaned_data['phone_number']
+            user.house_number = form.cleaned_data['house_number']
+            user.road_number = form.cleaned_data['road_number']
+            user.postal_code = form.cleaned_data['postal_code']
+            user.district = form.cleaned_data['district']
+            user.save()
+
+            success = cart.complete_order()
+            if success:
+                messages.success(request, "Order placed successfully!")
+                return redirect('products:home')
+            messages.error(request, "Not enough stock to complete your order.")
+            return redirect('products:cart')
+    else:
+        form = CheckoutForm(initial=initial_data)
+
+    return render(
+        request,
+        'products/checkout.html',
+        {
+            'cart': cart,
+            'items': cart.items.all(),
+            'total_price': cart.get_total_price(),
+            'form': form,
+        }
+    )
