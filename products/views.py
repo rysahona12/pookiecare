@@ -94,3 +94,75 @@ def product_detail_view(request, product_id):
     }
     
     return render(request, 'products/product_detail.html', context)
+
+
+@login_required
+def add_to_cart_view(request, product_id):
+    """Add a product to the authenticated user's cart."""
+    product = get_object_or_404(Product, product_id=product_id)
+
+    try:
+        quantity = int(request.POST.get('quantity', 1))
+    except (TypeError, ValueError):
+        quantity = 1
+
+    quantity = max(quantity, 1)
+    next_url = request.POST.get('next') or reverse('products:home')
+
+    if product.available_stock <= 0:
+        messages.error(request, "This product is currently out of stock.")
+        return redirect(next_url)
+
+    if quantity > product.available_stock:
+        messages.error(request, "Requested quantity exceeds available stock.")
+        return redirect(next_url)
+
+    order, _ = Order.objects.get_or_create(user=request.user, in_cart=True)
+    order_item, created = OrderItem.objects.get_or_create(
+        order=order,
+        product=product,
+        defaults={
+            'quantity': quantity,
+            'price_at_purchase': product.price,
+        }
+    )
+
+    if created:
+        messages.success(request, f"Added {quantity} x {product.product_name} to your cart.")
+    else:
+        new_quantity = order_item.quantity + quantity
+        if new_quantity > product.available_stock:
+            messages.error(
+                request,
+                f"Only {product.available_stock} items available. Update quantity in cart."
+            )
+            return redirect(next_url)
+        order_item.quantity = new_quantity
+        order_item.save()
+        messages.success(request, f"Updated {product.product_name} quantity in your cart.")
+
+    return redirect(next_url)
+
+
+@login_required
+def cart_view(request):
+    """Display the current user's shopping cart."""
+    cart = (
+        Order.objects.filter(user=request.user, in_cart=True)
+        .prefetch_related('items__product__brand', 'items__product__category')
+        .first()
+    )
+    items = cart.items.all() if cart else []
+    total_price = cart.get_total_price() if cart else 0
+
+    return render(
+        request,
+        'products/cart.html',
+        {
+            'cart': cart,
+            'items': items,
+            'total_price': total_price,
+        }
+    )
+
+
