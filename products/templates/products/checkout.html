@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - PookieCare</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .header {
+            background: white;
+            padding: 20px 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .header h1 { color: #667eea; font-size: 32px; }
+        .header-links { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+        .header-links a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            transition: background 0.3s, color 0.3s;
+            background: #f2f4ff;
+            font-weight: 600;
+        }
+        .header-links a:hover { background: #e0e5ff; }
+        .header-links .cart-link { background: #667eea; color: #fff; }
+        .header-links .cart-link:hover { background: #5568d3; }
+
+        .messages { max-width: 1200px; margin: 0 auto 15px auto; }
+        .message {
+            background: #fff;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            color: #333;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        .section-title { color: #667eea; margin-bottom: 16px; }
+        .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        label { font-weight: 600; color: #444; }
+        input, textarea {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        textarea { resize: vertical; }
+        .summary-card {
+            background: #f7f7ff;
+            border: 1px solid #e5e8ff;
+            padding: 16px;
+            border-radius: 10px;
+        }
+        .summary-card h3 { margin-bottom: 10px; color: #555; }
+        .summary-item { display: flex; justify-content: space-between; margin-bottom: 8px; color: #444; }
+        .summary-total { display: flex; justify-content: space-between; font-weight: 700; font-size: 18px; margin-top: 10px; }
+        .checkout-actions { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn { padding: 12px 18px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; }
+        .btn-primary { background: #667eea; color: #fff; }
+        .btn-primary:hover { background: #5568d3; }
+        .btn-ghost { background: #f2f4ff; color: #555; text-decoration: none; display: inline-block; }
+
+        @media (max-width: 900px) {
+            .container { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .header { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="{% url 'products:home' %}" style="text-decoration: none;">
+            <h1>PookieCare</h1>
+        </a>
+        <div class="header-links">
+            <a href="{% url 'products:home' %}">Home</a>
+            <a href="{% url 'products:cart' %}" class="cart-link">Cart</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'user:profile' %}">Profile</a>
+                {% if user.is_staff %}
+                    <a href="/admin/">Admin</a>
+                {% endif %}
+                <a href="{% url 'user:logout' %}">Logout</a>
+            {% else %}
+                <a href="{% url 'user:login' %}">Login</a>
+                <a href="{% url 'user:register' %}">Register</a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="message">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="container">
+        <div>
+            <h2 class="section-title">Shipping & Contact</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="{{ form.first_name.id_for_label }}">First Name</label>
+                        {{ form.first_name }}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.last_name.id_for_label }}">Last Name</label>
+                        {{ form.last_name }}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.phone_number.id_for_label }}">Phone Number</label>
+                        {{ form.phone_number }}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.house_number.id_for_label }}">House Number</label>
+                        {{ form.house_number }}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.road_number.id_for_label }}">Road Number</label>
+                        {{ form.road_number }}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.postal_code.id_for_label }}">Postal Code</label>
+                        {{ form.postal_code }}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.district.id_for_label }}">District</label>
+                        {{ form.district }}
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label for="{{ form.note.id_for_label }}">Order Note (Optional)</label>
+                        {{ form.note }}
+                    </div>
+                </div>
+                <div class="checkout-actions">
+                    <a class="btn btn-ghost" href="{% url 'products:cart' %}">Back to Cart</a>
+                    <button type="submit" class="btn btn-primary">Place Order</button>
+                </div>
+            </form>
+        </div>
+
+        <div>
+            <h2 class="section-title">Order Summary</h2>
+            <div class="summary-card">
+                <h3>{{ items|length }} item(s)</h3>
+                {% for item in items %}
+                    <div class="summary-item">
+                        <div>{{ item.product.product_name }} × {{ item.quantity }}</div>
+                        <div>BDT {{ item.get_subtotal|floatformat:2 }}</div>
+                    </div>
+                {% endfor %}
+                <div class="summary-total">
+                    <div>Total</div>
+                    <div>BDT {{ total_price|floatformat:2 }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
