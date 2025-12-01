@@ -250,6 +250,62 @@
             font-weight: bold;
             color: #ff69b4;
         }
+        .purchase-card {
+            background: white;
+            border: 2px solid #ffe4e1;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(255, 105, 180, 0.1);
+            max-width: 400px;
+            margin: 20px 0;
+        }
+        .purchase-card form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .purchase-card label {
+            font-size: 14px;
+            color: #333;
+        }
+        .purchase-card input[type="number"] {
+            padding: 10px;
+            border: 1px solid #ffb6c1;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .purchase-card input[type="number"]:focus {
+            outline: none;
+            border-color: #ff69b4;
+            box-shadow: 0 0 5px rgba(255, 105, 180, 0.3);
+        }
+        .purchase-card button {
+            padding: 12px;
+            background: #ff69b4;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .purchase-card button:hover {
+            background: #ff85c1;
+            transform: translateY(-2px);
+        }
+        .purchase-card button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .purchase-card .login-note {
+            font-size: 14px;
+            color: #ff69b4;
+            text-align: center;
+            padding: 10px 0;
+        }
         @media (max-width: 768px) {
             .navbar {
                 flex-direction: column;
@@ -299,9 +355,10 @@
         <div class="navbar-links">
             <a href="{% url 'products:home' %}">Home</a>
             <a href="{% url 'products:products_list' %}">Products</a>
-            <a href="{% url 'products:cart' %}" class="active">Cart</a>
+            <a href="{% url 'products:cart' %}" class="active">
+                Cart{% if cart_item_count %} ({{ cart_item_count }}){% endif %}
+            </a>
             <a href="{% url 'products:checkout' %}">Checkout</a>
-
             {% if user.is_authenticated %}
                 <a href="{% url 'user:profile' %}">Profile</a>
                 {% if user.is_staff %}
@@ -315,69 +372,92 @@
         </div>
     </nav>
 
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="message">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <div class="content-wrapper">
-    <div class="container">
-        <a href="{% url 'products:home' %}" class="back-link">← Back to Products</a>
-        
-        <div class="product-detail">
-            <div class="product-image-container">
-                {% if product.get_image_url %}
-                    <img src="{{ product.get_image_url }}" alt="{{ product.product_name }}">
-                {% else %}
-                    <span class="no-image">No Image Available</span>
-                {% endif %}
-            </div>
-            
-            <div class="product-info">
-                {% if product.featured %}
-                <div class="featured-badge">⭐ Featured Product</div>
-                {% endif %}
-                
-                <div class="product-brand">{{ product.brand.brand_name }}</div>
-                <h1>{{ product.product_name }}</h1>
-                <div class="product-category">{{ product.category.category_name }}</div>
-                
-                <div class="product-price">৳{{ product.price|floatformat:2 }}</div>
-                
-                <span class="product-stock {% if product.available_stock == 0 %}stock-out{% elif product.available_stock < 10 %}stock-low{% else %}stock-in{% endif %}">
-                    {{ product.get_stock_status }}
-                </span>
-                
-                <div class="product-details">
-                    <h2>Product Details</h2>
-                    <div class="product-details-content">
-                        {{ product.product_details|safe }}
+        <div class="container">
+            <a href="{% url 'products:home' %}" class="back-link">← Back to Products</a>
+
+            <div class="product-detail">
+                <div class="product-image-container">
+                    {% if product.get_image_url %}
+                        <img src="{{ product.get_image_url }}" alt="{{ product.product_name }}">
+                    {% else %}
+                        <span class="no-image">No Image Available</span>
+                    {% endif %}
+                </div>
+
+                <div class="product-info">
+                    {% if product.featured %}
+                        <div class="featured-badge">⭐ Featured Product</div>
+                    {% endif %}
+
+                    <div class="product-brand">{{ product.brand.brand_name }}</div>
+                    <h1>{{ product.product_name }}</h1>
+                    <div class="product-category">{{ product.category.category_name }}</div>
+                    <div class="product-price">BDT {{ product.price|floatformat:2 }}</div>
+
+                    <span class="product-stock {% if product.available_stock == 0 %}stock-out{% elif product.available_stock < 10 %}stock-low{% else %}stock-in{% endif %}">
+                        {{ product.get_stock_status }}
+                    </span>
+
+                    <div class="purchase-card">
+                        {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'products:add_to_cart' product.product_id %}">
+                            {% csrf_token %}
+                            <label for="quantity" style="font-weight:600;">Quantity</label>
+                            <input id="quantity" name="quantity" type="number" min="1" max="{{ product.available_stock }}" value="1">
+                            <input type="hidden" name="next" value="{% url 'products:product_detail' product.product_id %}">
+                            <button type="submit" {% if product.available_stock == 0 %}disabled style="background:#ccc; cursor:not-allowed;"{% endif %}>
+                                Add to Cart
+                            </button>
+                        </form>
+                        {% else %}
+                            <div class="login-note">Login to add this item to your cart.</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="product-details">
+                        <h2>Product Details</h2>
+                        <div class="product-details-content">
+                            {{ product.product_details|safe }}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        {% if related_products %}
-        <div class="related-section">
-            <h2>Related Products</h2>
-            <div class="products-grid">
-                {% for related in related_products %}
-                <a href="{% url 'products:product_detail' related.product_id %}" style="text-decoration: none; color: inherit;">
-                    <div class="product-card">
-                        <div class="product-card-image">
-                            {% if related.get_image_url %}
-                                <img src="{{ related.get_image_url }}" alt="{{ related.product_name }}">
-                            {% else %}
-                                <span>No Image</span>
-                            {% endif %}
-                        </div>
-                        <div class="product-card-info">
-                            <div class="product-card-brand">{{ related.brand.brand_name }}</div>
-                            <div class="product-card-name">{{ related.product_name }}</div>
-                            <div class="product-card-price">৳{{ related.price|floatformat:2 }}</div>
-                        </div>
-                    </div>
-                </a>
-                {% endfor %}
+
+            {% if related_products %}
+            <div class="related-section">
+                <h2>Related Products</h2>
+                <div class="products-grid">
+                    {% for related in related_products %}
+                        <a href="{% url 'products:product_detail' related.product_id %}" style="text-decoration: none; color: inherit;">
+                            <div class="product-card">
+                                <div class="product-card-image">
+                                    {% if related.get_image_url %}
+                                        <img src="{{ related.get_image_url }}" alt="{{ related.product_name }}">
+                                    {% else %}
+                                        <span>No Image</span>
+                                    {% endif %}
+                                </div>
+                                <div class="product-card-info">
+                                    <div class="product-card-brand">{{ related.brand.brand_name }}</div>
+                                    <div class="product-card-name">{{ related.product_name }}</div>
+                                    <div class="product-card-price">BDT {{ related.price|floatformat:2 }}</div>
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
             </div>
+            {% endif %}
         </div>
-        {% endif %}
-    </div>
     </div>
 </body>
 </html>
