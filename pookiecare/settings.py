@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'user',  # Custom user app
     'products',  # Products and orders app
+    'reviews.apps.ReviewsConfig',
 ]
 
 MIDDLEWARE = [
