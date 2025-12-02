@@ -5,6 +5,21 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from .models import Product, Brand, Category, Order, OrderItem
 from .forms import CheckoutForm
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from django.utils import timezone
+from io import BytesIO
+
+try:
+    import weasyprint
+except Exception:  
+    weasyprint = None
+
+try:
+    from reportlab.lib.pagesizes import letter
+    from reportlab.pdfgen import canvas
+except Exception:  
+    canvas = None
 
 
 def home_view(request):
@@ -266,3 +281,270 @@ def checkout_view(request):
             'form': form,
         }
     )
+
+
+@login_required
+def download_print_slip_view(request, order_id=None):
+    """Generate a PDF slip for an order.
+
+    If ``order_id`` is provided, the view returns the slip for that specific completed order.
+    If ``order_id`` is omitted, it returns a slip for the current cart (in_cart=True).
+    """
+    if order_id:
+        order = get_object_or_404(
+            Order.objects.filter(user=request.user, in_cart=False).prefetch_related('items__product'),
+            order_id=order_id,
+        )
+    else:
+        order = (
+            Order.objects.filter(user=request.user, in_cart=True)
+            .prefetch_related('items__product')
+            .first()
+        )
+        if not order:
+            return HttpResponse("No active cart to print.", status=404)
+
+    if not order.items.exists():
+        return HttpResponse("No items to print for this order.", status=404)
+
+    context = {
+        'order': order,
+        'items': order.items.all(),
+        'total_price': order.get_total_price(),
+        'user': request.user,
+        'printed_at': timezone.now(),
+    }
+
+    html_string = render_to_string('products/print_slip.html', context)
+
+    pdf_file = None
+
+    if weasyprint is not None:
+        try:
+            pdf_file = weasyprint.HTML(
+                string=html_string,
+                base_url=request.build_absolute_uri('/'),
+            ).write_pdf()
+        except Exception:
+            pdf_file = None  
+
+    if pdf_file is None and canvas is not None:
+        pdf_file = generate_reportlab_slip(context)
+
+    if pdf_file is None:
+        return HttpResponse(
+            "PDF generation not available (WeasyPrint/ReportLab failed).",
+            status=503,
+        )
+
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="order_{order.order_id}.pdf"'
+    return response
+
+
+def generate_reportlab_slip(context):
+    """Create a styled PDF slip using ReportLab as a dependency-light fallback."""
+    if canvas is None:
+        return None
+
+    from reportlab.lib import colors
+    from reportlab.lib.units import mm
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.platypus import (
+        SimpleDocTemplate,
+        Paragraph,
+        Spacer,
+        Table,
+        TableStyle,
+    )
+
+    order = context['order']
+    items = context['items']
+    total_price = context['total_price']
+    user = context['user']
+    printed_at = context['printed_at']
+
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=letter,
+        rightMargin=18 * mm,
+        leftMargin=18 * mm,
+        topMargin=22 * mm,
+        bottomMargin=22 * mm,
+    )
+
+    styles = getSampleStyleSheet()
+    styles.add(
+        ParagraphStyle(
+            name="Muted",
+            parent=styles["Normal"],
+            fontSize=9,
+            textColor=colors.HexColor("#6b6358"),
+            spaceAfter=2,
+        )
+    )
+    styles.add(
+        ParagraphStyle(
+            name="Label",
+            parent=styles["Normal"],
+            fontSize=9,
+            textColor=colors.HexColor("#6b6358"),
+            leading=11,
+            spaceAfter=1,
+        )
+    )
+    styles.add(
+        ParagraphStyle(
+            name="Heading",
+            parent=styles["Normal"],
+            fontSize=18,
+            textColor=colors.HexColor("#b88746"),
+            leading=22,
+            spaceAfter=2,
+        )
+    )
+
+    full_name = getattr(user, "get_full_name", lambda: "")() or user.email
+    address = getattr(user, "get_full_address", lambda: "")()
+    status = "In Cart" if order.in_cart else "Completed"
+    placed_at = order.completed_at or order.created_at
+
+    story = []
+
+    header_table = Table(
+        [
+            [
+                Paragraph(
+                    "<b>PookieCare</b><br/><font size=10 color='#6b6358'>Skin health, delivered with care.</font>",
+                    styles["Heading"],
+                ),
+                Paragraph(
+                    f"<font size=9 color='#6b6358'>Order ID</font><br/>{order.order_id}"
+                    f"<br/><br/><font size=9 color='#6b6358'>Placed</font><br/>{placed_at.strftime('%b %d, %Y %H:%M')}"
+                    f"<br/><br/><font size=9 color='#6b6358'>Printed</font><br/>{printed_at.strftime('%b %d, %Y %H:%M')}"
+                    f"<br/><br/><font size=9 color='#b88746'>&#9632; {status}</font>",
+                    styles["Normal"],
+                ),
+            ]
+        ],
+        colWidths=[doc.width * 0.55, doc.width * 0.45],
+        hAlign="LEFT",
+    )
+    header_table.setStyle(
+        TableStyle(
+            [
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+                ("LINEBELOW", (0, 0), (-1, 0), 0.25, colors.HexColor("#d9cbb3")),
+            ]
+        )
+    )
+    story.append(header_table)
+    story.append(Spacer(1, 8))
+
+    customer_details = [
+        [
+            Paragraph(
+                f"<font size=9 color='#6b6358'>Name</font><br/><b>{full_name}</b>",
+                styles["Normal"],
+            ),
+            Paragraph(
+                f"<font size=9 color='#6b6358'>Phone</font><br/>{getattr(user, 'phone_number', '')}",
+                styles["Normal"],
+            ),
+        ],
+        [
+            Paragraph(
+                f"<font size=9 color='#6b6358'>Address</font><br/>{address}",
+                styles["Normal"],
+            )
+        ],
+    ]
+    customer_inner = Table(
+        customer_details,
+        colWidths=[doc.width * 0.4, doc.width * 0.6],
+        hAlign="LEFT",
+    )
+    customer_inner.setStyle(
+        TableStyle(
+            [
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("SPAN", (0, 1), (-1, 1)),
+                ("TOPPADDING", (0, 0), (-1, -1), 4),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+            ]
+        )
+    )
+    customer_panel = Table(
+        [
+            [Paragraph("<font size=9 color='#6b6358'>Customer</font>", styles["Muted"])],
+            [customer_inner],
+        ],
+        colWidths=[doc.width],
+    )
+    customer_panel.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#fbfaf8")),
+                ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#d9cbb3")),
+                ("LEFTPADDING", (0, 0), (-1, -1), 10),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 10),
+                ("TOPPADDING", (0, 0), (-1, -1), 10),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+            ]
+        )
+    )
+    story.append(customer_panel)
+    story.append(Spacer(1, 12))
+
+    table_data = [["Product", "Qty", "Amount (BDT)"]]
+    for item in items:
+        table_data.append(
+            [
+                item.product.product_name,
+                str(item.quantity),
+                f"{item.get_subtotal():.2f}",
+            ]
+        )
+    table_data.append(["", "Total", f"{total_price:.2f}"])
+
+    items_table = Table(
+        table_data,
+        colWidths=[doc.width * 0.55, doc.width * 0.15, doc.width * 0.3],
+        repeatRows=1,
+    )
+    items_table.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#fbfaf8")),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.HexColor("#6b6358")),
+                ("LINEBELOW", (0, 0), (-1, 0), 0.5, colors.HexColor("#d9cbb3")),
+                ("ALIGN", (1, 1), (-1, -2), "RIGHT"),
+                ("ALIGN", (1, -1), (-1, -1), "RIGHT"),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("FONTSIZE", (0, 0), (-1, 0), 11),
+                ("FONTSIZE", (0, 1), (-1, -1), 10),
+                ("BOTTOMPADDING", (0, 0), (-1, 0), 8),
+                ("TOPPADDING", (0, 0), (-1, 0), 8),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -2), [colors.white, colors.HexColor("#fbfaf8")]),
+                ("LINEBELOW", (0, -2), (-1, -2), 0.25, colors.HexColor("#d9cbb3")),
+                ("FONTNAME", (0, -1), (-1, -1), "Helvetica-Bold"),
+                ("TOPPADDING", (0, -1), (-1, -1), 10),
+                ("BOTTOMPADDING", (0, -1), (-1, -1), 10),
+            ]
+        )
+    )
+    story.append(items_table)
+    story.append(Spacer(1, 14))
+
+    footer = Paragraph(
+        "Thank you for trusting PookieCare. Please retain this slip for your records.",
+        styles["Muted"],
+    )
+    story.append(footer)
+
+    doc.build(story)
+    buffer.seek(0)
+    return buffer.getvalue()
