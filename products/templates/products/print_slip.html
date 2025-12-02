@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Slip - PookieCare</title>
+    <style>
+        :root {
+            --ink: #2f2a24;
+            --muted: #6b6358;
+            --accent: #b88746;
+            --border: #d9cbb3;
+            --paper: #f5f2ec;
+            --white: #ffffff;
+        }
+        @page {
+            size: A4;
+            margin: 22mm 18mm;
+        }
+        body {
+            font-family: "Georgia", "Times New Roman", serif;
+            background: var(--paper);
+            color: var(--ink);
+            line-height: 1.5;
+        }
+        .sheet {
+            background: var(--white);
+            border: 1px solid var(--border);
+            padding: 26px;
+            max-width: 820px;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .brand-block {
+            letter-spacing: 1px;
+        }
+        .brand {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+        }
+        .tagline {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+        .meta {
+            text-align: right;
+            font-size: 13px;
+            color: var(--muted);
+        }
+        .badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            border-radius: 6px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 6px;
+        }
+        .section-title {
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+        .panel {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-top: 12px;
+            background: #fbfaf8;
+        }
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .label {
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+        .value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ink);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 14px;
+            font-size: 13px;
+        }
+        th {
+            text-align: left;
+            padding: 10px 8px;
+            border-bottom: 1px solid var(--border);
+            letter-spacing: 0.4px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+        td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #e8e0d1;
+        }
+        tfoot th, tfoot td {
+            border-bottom: none;
+            font-size: 13px;
+        }
+        .right { text-align: right; }
+        .total-row th, .total-row td {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--ink);
+            padding-top: 12px;
+        }
+        .footer {
+            margin-top: 18px;
+            font-size: 12px;
+            color: var(--muted);
+            text-align: center;
+            letter-spacing: 0.2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sheet">
+        <div class="header">
+            <div class="brand-block">
+                <div class="brand">PookieCare</div>
+                <div class="tagline">Skin health, delivered with care.</div>
+            </div>
+            <div class="meta">
+                <div class="label">Order ID</div>
+                <div class="value">{{ order.order_id }}</div>
+                <div class="label" style="margin-top:8px;">Placed</div>
+                <div>{{ order.completed_at|default:order.created_at|date:"M d, Y H:i" }}</div>
+                <div class="label" style="margin-top:8px;">Printed</div>
+                <div>{{ printed_at|date:"M d, Y H:i" }}</div>
+                <div class="badge">
+                    {% if order.in_cart %}In Cart{% else %}Completed{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="panel" style="margin-top:16px;">
+            <div class="section-title">Customer</div>
+            <div class="details-grid">
+                <div>
+                    <div class="label">Name</div>
+                    <div class="value">{{ user.get_full_name|default:user.email }}</div>
+                </div>
+                <div>
+                    <div class="label">Phone</div>
+                    <div class="value">{{ user.phone_number }}</div>
+                </div>
+                <div style="grid-column: 1 / -1;">
+                    <div class="label">Address</div>
+                    <div class="value">{{ user.get_full_address }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="section-title">{{ items|length }} Item(s)</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th class="right">Qty</th>
+                        <th class="right">Amount (BDT)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ item.product.product_name }}</td>
+                        <td class="right">{{ item.quantity }}</td>
+                        <td class="right">{{ item.get_subtotal|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <th colspan="2" class="right">Total</th>
+                        <td class="right">{{ total_price|floatformat:2 }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="footer">
+            Thank you for trusting PookieCare. Please retain this slip for your records.
+        </div>
+    </div>
+</body>
+</html>
