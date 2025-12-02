@@ -21,7 +21,6 @@ try:
 except Exception:  
     canvas = None
 
-
 def home_view(request):
     """Display homepage with latest products and featured products."""
     all_products = Product.objects.filter(available_stock__gt=0).select_related('brand', 'category')
@@ -264,8 +263,8 @@ def checkout_view(request):
 
             success = cart.complete_order()
             if success:
-                messages.success(request, "Order placed successfully!")
-                return redirect('products:home')
+                messages.success(request, "Order placed successfully! Your slip download will begin.")
+                return download_print_slip_view(request, order_id=cart.order_id)
             messages.error(request, "Not enough stock to complete your order.")
             return redirect('products:cart')
     else:
@@ -326,7 +325,7 @@ def download_print_slip_view(request, order_id=None):
                 base_url=request.build_absolute_uri('/'),
             ).write_pdf()
         except Exception:
-            pdf_file = None  
+            pdf_file = None 
 
     if pdf_file is None and canvas is not None:
         pdf_file = generate_reportlab_slip(context)
