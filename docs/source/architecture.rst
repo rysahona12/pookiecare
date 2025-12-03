@@ -35,6 +35,19 @@ Request Flow
 * Static media (uploaded product images) are exposed during development via
   ``django.conf.urls.static``.
 
+Authentication Workflow
+-----------------------
+
+1. ``user.views.register_view`` uses ``UserRegistrationForm`` to create accounts
+   with validated Bangladeshi phone numbers and full addresses.
+2. ``user.backends.EmailBackend`` authenticates via email address so usernames
+   never surface.
+3. ``login_view`` stores the session and displays a personalized flash message.
+4. ``logout_view`` invalidates the session and redirects to the login page.
+5. ``LOGIN_URL``/``LOGIN_REDIRECT_URL``/``LOGOUT_REDIRECT_URL`` are centralized
+   in ``pookiecare.settings`` so any ``@login_required`` view follows the same
+   UX path.
+
 Data Modeling
 -------------
 
@@ -58,6 +71,27 @@ HTML templates live under ``products/templates/products`` and
 cards, search input with debounce handling, and sidebar filters for brand,
 category, price bounds, and sorting (latest, ascending price, descending price).
 
+Media Handling
+--------------
+
+* Uploaded product images live under ``media/products/images/`` and render via
+  ``Product.get_image_url()`` (uploaded file wins over external URL).
+* ``MEDIA_URL``/``MEDIA_ROOT`` in ``settings.py`` map the storage path, while
+  ``urls.py`` exposes them only during development.
+
+Admin Interface
+---------------
+
+The Django admin provides the back-office workflow:
+
+* Custom ``UserAdmin`` surfaces authentication, personal info, address, and
+  permission groupings plus search + filters tailored for Bangladeshi data.
+* ``Brand``/``Category`` list views show product counts and timestamp metadata.
+* ``ProductAdmin`` adds inline image previews, currency formatting, and stock
+  color badges to quickly identify low or out-of-stock items.
+* ``OrderAdmin`` embeds ``OrderItem`` inlines, total price/quantity summaries,
+  and a bulk action that calls ``Order.complete_order()`` with stock checks.
+
 Extensibility
 -------------
 
@@ -66,3 +100,15 @@ Extensibility
 * The Sphinx documentation uses autodoc to pull live docstrings from both apps,
   so future modules become part of the API reference without extra wiring once
   they expose docstrings.
+
+Testing & Quality
+-----------------
+
+* ``python manage.py test`` runs the full suite (currently 78 tests: 37 ``user``
+  + 41 ``products``).
+* ``user.tests`` focuses on registration validation, profile editing, and the
+  custom authentication backend.
+* ``products.tests`` covers catalog filtering/sorting, product detail behavior,
+  order management, and stock adjustments.
+* ``TEST_COVERAGE_SUMMARY.md`` documents the latest coverage figures for quick
+  reference when changing core flows.

@@ -12,5 +12,6 @@ generated from the live Django codebase.
 
    getting_started
    architecture
+   user_app
    products_app
    api_reference

@@ -43,9 +43,48 @@ Models Recap
   ``Order.complete_order()`` performs stock validation, decrements inventory per
   item, sets ``in_cart=False``, and stamps ``completed_at``.
 
+Ordering Workflow
+-----------------
+
+1. ``Order`` instances start with ``in_cart=True`` and collect ``OrderItem``
+   rows via the ``items`` related name.
+2. ``Order.get_total_items()`` and ``Order.get_total_price()`` aggregate
+   quantities and BDT totals for dashboards/admin.
+3. ``Order.complete_order()`` ensures each ``OrderItem`` has enough stock,
+   decrements ``Product.available_stock``, and toggles ``in_cart``/timestamps.
+4. ``OrderItem.save()`` snapshots the unit price at purchase time so order
+   history stays accurate even if catalog prices change later.
+
+Templates & UX
+--------------
+
+* ``products/home.html`` highlights featured products plus the latest arrivals,
+  all styled with the baby pink gradient theme shared across the app.
+* ``products/products_list.html`` implements a sticky navbar, sidebar filters,
+  responsive card layout, dynamic search with 500 ms debounce, and price badges.
+* ``products/product_detail.html`` renders product descriptions using the stored
+  HTML, shows stock indicators, and promotes related items from the same
+  category.
+
 Admin Integration
 -----------------
 
 All catalog models are registered in ``products/admin.py`` (not shown here) so
 site administrators can manage brands, categories, products, and cart items via
 Django admin without touching the database directly.
+
+Key admin enhancements include:
+
+* Inline image previews, formatted BDT pricing, and colored stock badges for
+  quick triage.
+* ``OrderItem`` inline editing from the order detail page plus subtotal displays.
+* Bulk action ``complete_orders`` that reuses ``Order.complete_order()`` to move
+  carts into the completed state while respecting inventory.
+
+Testing Notes
+-------------
+
+``python manage.py test products.tests`` executes the catalog suite (41 tests)
+covering model helpers, view context (filters/search/sorting), detail page
+behavior, and the stock-updating order workflow. Extend this suite alongside any
+new catalog or ordering features.
