@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart - PookieCare</title>
+    <style>
+        * {
+            margin: 0; 
+            padding: 0; 
+            box-sizing: 
+            border-box; 
+        }
+        body {
+            font-family: 'Consolas', 'Courier New', monospace;
+            background: linear-gradient(135deg, #ffc0cb 0%, #ffb6c1 100%);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: white;
+            padding: 20px 60px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        .navbar-brand h1 {
+            color: #ff69b4;
+            font-size: 28px;
+            margin: 0;
+            font-weight: bold;
+        }
+        .navbar-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .navbar-links a {
+            color: #ff69b4;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .navbar-links a:hover {
+            background: #ffe4e1;
+            transform: translateY(-2px);
+        }
+        .navbar-links .active {
+            background: #ff69b4;
+            color: white !important;
+        }
+        .content-wrapper {
+            padding: 30px 60px;
+        }
+        .section {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(255, 105, 180, 0.15);
+            margin-bottom: 30px;
+        }
+        .section h2 {
+            color: #ff69b4;
+            margin-bottom: 25px;
+            font-size: 28px;
+            font-weight: bold;
+            border-bottom: 3px solid #ffb6c1;
+            padding-bottom: 10px;
+        }
+        .messages {
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+        .message {
+            background: #fff;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(255,105,180,0.2);
+            margin-bottom: 10px;
+            color: #444;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #ffe4e1;
+            font-size: 15px;
+        }
+        th {
+            background: #fff0f5;
+            color: #ff69b4;
+            font-weight: bold;
+        }
+        td img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid #ffe4e1;
+        }
+        .btn {
+            padding: 10px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .btn-primary {
+            background: #ff69b4;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #ff85c2;
+        }
+        .btn-ghost {
+            background: #ffe4e1;
+            color: #ff69b4;
+        }
+        .btn-ghost:hover {
+            background: #ffd6db;
+        }
+        .btn-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .btn-danger:hover {
+            background: #f5c6cb;
+        }
+        .summary {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .summary-total {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+        }
+        .empty {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 15px 20px; flex-direction: column; gap: 15px; }
+            .content-wrapper { padding: 20px; }
+            .section { padding: 20px; }
+            table { display: block; overflow-x: auto; }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="{% url 'products:home' %}" class="navbar-brand">
+            <span style="font-size: 32px;">🧴</span>
+            <h1>PookieCare</h1>
+        </a>
+        <div class="navbar-links">
+            <a href="{% url 'products:home' %}">Home</a>
+            <a href="{% url 'products:products_list' %}">Products</a>
+            <a href="{% url 'products:cart' %}" class="active">Cart</a>
+            <a href="{% url 'products:checkout' %}">Checkout</a>
+
+            {% if user.is_authenticated %}
+                <a href="{% url 'user:profile' %}">Profile</a>
+                {% if user.is_staff %}
+                    <a href="/admin/">Admin</a>
+                {% endif %}
+                <a href="{% url 'user:logout' %}">Logout</a>
+            {% else %}
+                <a href="{% url 'user:login' %}">Login</a>
+                <a href="{% url 'user:register' %}">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="message">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="content-wrapper">
+        <div class="section">
+            <h2>Your Cart</h2>
+
+            {% if items %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price (BDT)</th>
+                        <th>Quantity</th>
+                        <th>Subtotal</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>
+                            <div style="display:flex; gap:15px; align-items:center;">
+                                {% if item.product.get_image_url %}
+                                    <img src="{{ item.product.get_image_url }}" alt="{{ item.product.product_name }}">
+                                {% else %}
+                                    <div style="width:80px; height:80px; background:#ffe4e1; border-radius:10px; display:flex; justify-content:center; align-items:center; color:#ff69b4;">No Image</div>
+                                {% endif %}
+                                <div>
+                                    <div style="font-weight:700; color:#333;">{{ item.product.product_name }}</div>
+                                    <div style="color:#777; font-size:13px;">{{ item.product.brand.brand_name }} • {{ item.product.category.category_name }}</div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>{{ item.price_at_purchase }}</td>
+
+                        <td>
+                            <form method="post" action="{% url 'products:update_cart_item' item.order_item_id %}">
+                                {% csrf_token %}
+                                <input 
+                                    type="number"
+                                    name="quantity"
+                                    min="1"
+                                    max="{{ item.product.available_stock }}"
+                                    value="{{ item.quantity }}"
+                                    style="width:70px; padding:8px; border:1px solid #ffd6db; border-radius:6px;"
+                                >
+                                <button class="btn btn-ghost">Update</button>
+                            </form>
+                        </td>
+
+                        <td>{{ item.get_subtotal|floatformat:2 }}</td>
+
+                        <td>
+                            <form method="post" action="{% url 'products:remove_cart_item' item.order_item_id %}">
+                                {% csrf_token %}
+                                <button class="btn btn-danger">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="summary">
+                <div class="summary-total">
+                    Total: BDT {{ total_price|floatformat:2 }}
+                </div>
+
+                <div style="display:flex; gap:15px;">
+                    <a href="{% url 'products:home' %}" class="btn btn-ghost" style="text-decoration:none;">Add More Items</a>
+                    <a href="{% url 'products:checkout' %}" class="btn btn-primary" style="text-decoration:none;">Proceed to Checkout</a>
+                </div>
+            </div>
+
+            {% else %}
+            <div class="empty">
+                Your cart is empty.<br><br>
+                <a href="{% url 'products:home' %}" class="btn btn-primary" style="text-decoration:none;">Browse Products</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
