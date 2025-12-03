@@ -208,6 +208,7 @@
             <a href="{% url 'products:products_list' %}">Products</a>
             <a href="{% url 'products:cart' %}" class="active">Cart</a>
             {% if user.is_authenticated %}
+                <a href="{% url 'products:orders' %}">Orders</a>
                 <a href="{% url 'user:profile' %}">Profile</a>
                 {% if user.is_staff %}
                     <a href="/admin/">Admin</a>

@@ -56,7 +56,16 @@ def logout_view(request):
 @login_required
 def profile_view(request):
     """Display user profile."""
-    return render(request, 'user/profile.html', {'user': request.user})
+    from products.models import Order
+    
+    # Get cart item count for navbar
+    cart = Order.objects.filter(user=request.user, in_cart=True).first()
+    cart_item_count = cart.get_total_items() if cart else 0
+    
+    return render(request, 'user/profile.html', {
+        'user': request.user,
+        'cart_item_count': cart_item_count
+    })
 
 
 @login_required

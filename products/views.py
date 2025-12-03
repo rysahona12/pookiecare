@@ -287,6 +287,24 @@ def checkout_view(request):
 
 
 @login_required
+def orders_view(request):
+    """Display user's past orders."""
+    orders = Order.objects.filter(
+        user=request.user, 
+        in_cart=False
+    ).prefetch_related('items__product__brand', 'items__product__category').order_by('-completed_at')
+    
+    # Get cart item count for navbar
+    cart = Order.objects.filter(user=request.user, in_cart=True).first()
+    cart_item_count = cart.get_total_items() if cart else 0
+    
+    return render(request, 'products/orders.html', {
+        'orders': orders,
+        'cart_item_count': cart_item_count,
+    })
+
+
+@login_required
 def download_print_slip_view(request, order_id=None):
     """Generate a PDF slip for an order.
 
