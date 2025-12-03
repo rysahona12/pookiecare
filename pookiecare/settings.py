@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',  # For graph_models and other utilities
     'user',  # Custom user app
     'products',  # Products and orders app
 ]
