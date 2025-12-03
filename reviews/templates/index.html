@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Reviews</title>
+
+  <!-- Fonts (optional) -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ------------- GLOBAL ------------- */
+    :root{
+      --peach:#F2C7BC;
+      --cream:#F3EAE5;
+      --white-soft:#FFFAFA;
+      --maroon:#4e0000;
+      --btn:#9c8888;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:"Poppins",sans-serif;
+      background-color:var(--peach);
+      color:#2b1b1b;
+      -webkit-font-smoothing:antialiased;
+    }
+
+    /* ------------- HEADER ------------- */
+    .header-section{
+      background-color:var(--cream);
+      padding:48px 20px;
+      text-align:center;
+      border-bottom: 18px solid rgba(0,0,0,0.02);
+    }
+    .header-section h1{
+      margin:0;
+      font-family:"Cinzel",serif;
+      font-weight:700;
+      font-size:68px;
+      letter-spacing:4px;
+      text-transform:uppercase;
+    }
+
+    /* ------------- WRITE REVIEW ------------- */
+    .write-section{
+      width:92%;
+      max-width:1200px;
+      margin:36px auto;
+      display:flex;
+      align-items:center;
+      gap:22px;
+    }
+    .write-box{
+      flex:1;
+      height:64px;
+      padding:22px;
+      border-radius:20px;
+      border:none;
+      background-color:var(--white-soft);
+      font-size:15px;
+      resize:none;
+      box-shadow: none;
+    }
+    .star-row{
+      white-space:nowrap;
+      font-size:30px;
+      color:var(--maroon);
+    }
+    .submit-btn{
+      background:var(--btn);
+      color:#fff;
+      padding:12px 24px;
+      border-radius:22px;
+      border:none;
+      cursor:pointer;
+      font-weight:600;
+    }
+    .submit-btn:hover{opacity:0.92}
+
+    /* ------------- TOP HEADING ------------- */
+    .top-heading{
+      font-family:"Bebas Neue",sans-serif;
+      text-align:center;
+      font-size:40px;
+      letter-spacing:1px;
+      margin-top:42px;
+      margin-bottom:10px;
+    }
+
+    /* ------------- REVIEW CARDS ------------- */
+    .review-card{
+      width:92%;
+      max-width:1200px;
+      margin:20px auto;
+      display:flex;
+      gap:28px;
+      align-items:flex-start;
+      background:var(--white-soft);
+      padding:22px;
+      border-radius:18px;
+    }
+    .review-stars{ font-size:28px; color:var(--maroon); width:120px; text-align:left; }
+    .review-content h3{ margin:0; color:#6a4c4c; font-size:16px; font-weight:600; }
+    .review-content p{ margin:6px 0 0; color:#7c6262; line-height:1.5; }
+
+    /* ------------- Responsive ------------- */
+    @media (max-width:880px){
+      .write-section{ flex-direction:column; align-items:stretch; gap:12px; }
+      .review-stars{ width:100%; order:2; }
+      .review-card{ flex-direction:column; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-section">
+    <h1>Reviews</h1>
+  </div>
+
+  <div class="write-section">
+    <textarea class="write-box" placeholder="Write a review"></textarea>
+    <div class="star-row">★ ★ ★ ★ ★</div>
+    <button class="submit-btn">SUBMIT</button>
+  </div>
+
+  <div class="top-heading">TOP REVIEWS</div>
+
+  <!-- Repeat these review-card blocks as needed -->
+  <div class="review-card">
+    <div class="review-stars">★ ★ ★ ★ ★</div>
+    <div class="review-content">
+      <h3>Name</h3>
+      <p>Review</p>
+    </div>
+  </div>
+
+  <div class="review-card">
+    <div class="review-stars">★ ★ ★ ★ ★</div>
+    <div class="review-content">
+      <h3>Name</h3>
+      <p>Review</p>
+    </div>
+  </div>
+
+  <div class="review-card">
+    <div class="review-stars">★ ★ ★ ★ ★</div>
+    <div class="review-content">
+      <h3>Name</h3>
+      <p>Review</p>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django_extensions',  # For graph_models and other utilities
     'user',  # Custom user app
     'products',  # Products and orders app
+    'reviews.apps.ReviewsConfig',
 ]
 
 MIDDLEWARE = [
