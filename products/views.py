@@ -261,6 +261,10 @@ def checkout_view(request):
             user.district = form.cleaned_data['district']
             user.save()
 
+            # Save order note
+            cart.note = form.cleaned_data.get('note', '')
+            cart.save()
+
             success = cart.complete_order()
             if success:
                 messages.success(request, "Order placed successfully! Your slip download will begin.")

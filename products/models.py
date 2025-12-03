@@ -149,6 +149,11 @@ class Order(models.Model):
         default=True,
         help_text='True if items are in cart, False if order is completed'
     )
+    note = models.TextField(
+        blank=True,
+        default='',
+        help_text='Optional order note or special instructions'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     completed_at = models.DateTimeField(

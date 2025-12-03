@@ -155,6 +155,10 @@ class OrderAdmin(admin.ModelAdmin):
         ('Order Summary', {
             'fields': ('total_items', 'total_price_display')
         }),
+        ('Order Note', {
+            'fields': ('note',),
+            'classes': ('collapse',)
+        }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at', 'completed_at')
         }),

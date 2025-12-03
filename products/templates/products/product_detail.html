@@ -251,13 +251,18 @@
             color: #ff69b4;
         }
         .purchase-card {
-            background: white;
-            border: 2px solid #ffe4e1;
+            background: linear-gradient(135deg, #fff5f7 0%, #ffe4e8 100%);
+            border: 2px solid #ffb6c1;
             border-radius: 15px;
             padding: 25px;
-            box-shadow: 0 5px 20px rgba(255, 105, 180, 0.1);
-            max-width: 400px;
-            margin: 20px 0;
+            margin-top: 25px;
+            box-shadow: 0 5px 20px rgba(255, 105, 180, 0.15);
+        }
+        .purchase-card h3 {
+            color: #ff69b4;
+            font-size: 18px;
+            margin-bottom: 20px;
+            font-weight: 700;
         }
         .purchase-card form {
             display: flex;
@@ -267,44 +272,112 @@
         .purchase-card label {
             font-size: 14px;
             color: #333;
+            font-weight: 600;
         }
         .purchase-card input[type="number"] {
-            padding: 10px;
-            border: 1px solid #ffb6c1;
-            border-radius: 8px;
-            font-size: 14px;
-            width: 100%;
-            box-sizing: border-box;
+            padding: 12px 15px;
+            border: 2px solid #ffb6c1;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: 'Consolas', monospace;
+            transition: all 0.3s;
         }
         .purchase-card input[type="number"]:focus {
             outline: none;
             border-color: #ff69b4;
-            box-shadow: 0 0 5px rgba(255, 105, 180, 0.3);
+            box-shadow: 0 0 10px rgba(255, 105, 180, 0.3);
         }
         .purchase-card button {
-            padding: 12px;
-            background: #ff69b4;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #ff69b4 0%, #ff85c1 100%);
             color: white;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             border: none;
             border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
         }
         .purchase-card button:hover {
-            background: #ff85c1;
             transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 105, 180, 0.4);
         }
         .purchase-card button:disabled {
-            background: #ccc;
+            background: linear-gradient(135deg, #ccc 0%, #ddd 100%);
             cursor: not-allowed;
+            box-shadow: none;
         }
         .purchase-card .login-note {
             font-size: 14px;
             color: #ff69b4;
             text-align: center;
-            padding: 10px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        .purchase-card .login-note a {
+            color: #ff1493;
+            text-decoration: none;
+            font-weight: 700;
+        }
+        .purchase-card .login-note a:hover {
+            text-decoration: underline;
+        }
+        .popup-message {
+            position: fixed;
+            top: 100px;
+            right: 30px;
+            background: white;
+            border: 2px solid #ff69b4;
+            border-radius: 15px;
+            padding: 20px 30px;
+            box-shadow: 0 10px 30px rgba(255, 105, 180, 0.4);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideIn 0.4s ease-out;
+            opacity: 1;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+        .popup-message.show {
+            opacity: 1;
+        }
+        .popup-message .icon {
+            font-size: 28px;
+        }
+        .popup-message .content {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .popup-message .title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #ff69b4;
+        }
+        .popup-message .text {
+            font-size: 14px;
+            color: #666;
         }
         @media (max-width: 768px) {
             .navbar {
@@ -355,10 +428,7 @@
         <div class="navbar-links">
             <a href="{% url 'products:home' %}">Home</a>
             <a href="{% url 'products:products_list' %}">Products</a>
-            <a href="{% url 'products:cart' %}" class="active">
-                Cart{% if cart_item_count %} ({{ cart_item_count }}){% endif %}
-            </a>
-            <a href="{% url 'products:checkout' %}">Checkout</a>
+            <a href="{% url 'products:cart' %}">Cart{% if cart_item_count %} ({{ cart_item_count }}){% endif %}</a>
             {% if user.is_authenticated %}
                 <a href="{% url 'user:profile' %}">Profile</a>
                 {% if user.is_staff %}
@@ -372,92 +442,140 @@
         </div>
     </nav>
 
-    {% if messages %}
-    <div class="messages">
-        {% for message in messages %}
-            <div class="message">{{ message }}</div>
-        {% endfor %}
-    </div>
-    {% endif %}
-
     <div class="content-wrapper">
-        <div class="container">
-            <a href="{% url 'products:home' %}" class="back-link">← Back to Products</a>
-
-            <div class="product-detail">
-                <div class="product-image-container">
-                    {% if product.get_image_url %}
-                        <img src="{{ product.get_image_url }}" alt="{{ product.product_name }}">
-                    {% else %}
-                        <span class="no-image">No Image Available</span>
-                    {% endif %}
-                </div>
-
-                <div class="product-info">
-                    {% if product.featured %}
-                        <div class="featured-badge">⭐ Featured Product</div>
-                    {% endif %}
-
-                    <div class="product-brand">{{ product.brand.brand_name }}</div>
-                    <h1>{{ product.product_name }}</h1>
-                    <div class="product-category">{{ product.category.category_name }}</div>
-                    <div class="product-price">BDT {{ product.price|floatformat:2 }}</div>
-
-                    <span class="product-stock {% if product.available_stock == 0 %}stock-out{% elif product.available_stock < 10 %}stock-low{% else %}stock-in{% endif %}">
-                        {{ product.get_stock_status }}
-                    </span>
-
-                    <div class="purchase-card">
-                        {% if user.is_authenticated %}
-                        <form method="post" action="{% url 'products:add_to_cart' product.product_id %}">
+    <div class="container">
+        <a href="{% url 'products:home' %}" class="back-link">← Back to Products</a>
+        
+        <div class="product-detail">
+            <div class="product-image-container">
+                {% if product.get_image_url %}
+                    <img src="{{ product.get_image_url }}" alt="{{ product.product_name }}">
+                {% else %}
+                    <span class="no-image">No Image Available</span>
+                {% endif %}
+            </div>
+            
+            <div class="product-info">
+                {% if product.featured %}
+                <div class="featured-badge">⭐ Featured Product</div>
+                {% endif %}
+                
+                <div class="product-brand">{{ product.brand.brand_name }}</div>
+                <h1>{{ product.product_name }}</h1>
+                <div class="product-category">{{ product.category.category_name }}</div>
+                
+                <div class="product-price">৳{{ product.price|floatformat:2 }}</div>
+                
+                <span class="product-stock {% if product.available_stock == 0 %}stock-out{% elif product.available_stock < 10 %}stock-low{% else %}stock-in{% endif %}">
+                    {{ product.get_stock_status }}
+                </span>
+                
+                <div class="purchase-card">
+                    <h3>🛒 Add to Cart</h3>
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'products:add_to_cart' product.product_id %}" onsubmit="return handleAddToCart(event, '{{ product.product_name }}')">
                             {% csrf_token %}
-                            <label for="quantity" style="font-weight:600;">Quantity</label>
-                            <input id="quantity" name="quantity" type="number" min="1" max="{{ product.available_stock }}" value="1">
+                            <label for="quantity">Quantity:</label>
+                            <input 
+                                id="quantity" 
+                                name="quantity" 
+                                type="number" 
+                                min="1" 
+                                max="{{ product.available_stock }}" 
+                                value="1"
+                                {% if product.available_stock == 0 %}disabled{% endif %}
+                            >
                             <input type="hidden" name="next" value="{% url 'products:product_detail' product.product_id %}">
-                            <button type="submit" {% if product.available_stock == 0 %}disabled style="background:#ccc; cursor:not-allowed;"{% endif %}>
-                                Add to Cart
+                            <button 
+                                type="submit" 
+                                {% if product.available_stock == 0 %}disabled{% endif %}
+                            >
+                                {% if product.available_stock == 0 %}Out of Stock{% else %}Add to Cart{% endif %}
                             </button>
                         </form>
-                        {% else %}
-                            <div class="login-note">Login to add this item to your cart.</div>
-                        {% endif %}
+                    {% else %}
+                        <div class="login-note">
+                            Please <a href="{% url 'user:login' %}">login</a> to add items to your cart.
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="product-details">
+                    <h2>Product Details</h2>
+                    <div class="product-details-content">
+                        {{ product.product_details|safe }}
                     </div>
-
-                    <div class="product-details">
-                        <h2>Product Details</h2>
-                        <div class="product-details-content">
-                            {{ product.product_details|safe }}
+                </div>
+            </div>
+        </div>
+        
+        {% if related_products %}
+        <div class="related-section">
+            <h2>Related Products</h2>
+            <div class="products-grid">
+                {% for related in related_products %}
+                <a href="{% url 'products:product_detail' related.product_id %}" style="text-decoration: none; color: inherit;">
+                    <div class="product-card">
+                        <div class="product-card-image">
+                            {% if related.get_image_url %}
+                                <img src="{{ related.get_image_url }}" alt="{{ related.product_name }}">
+                            {% else %}
+                                <span>No Image</span>
+                            {% endif %}
+                        </div>
+                        <div class="product-card-info">
+                            <div class="product-card-brand">{{ related.brand.brand_name }}</div>
+                            <div class="product-card-name">{{ related.product_name }}</div>
+                            <div class="product-card-price">৳{{ related.price|floatformat:2 }}</div>
                         </div>
                     </div>
-                </div>
+                </a>
+                {% endfor %}
             </div>
-
-            {% if related_products %}
-            <div class="related-section">
-                <h2>Related Products</h2>
-                <div class="products-grid">
-                    {% for related in related_products %}
-                        <a href="{% url 'products:product_detail' related.product_id %}" style="text-decoration: none; color: inherit;">
-                            <div class="product-card">
-                                <div class="product-card-image">
-                                    {% if related.get_image_url %}
-                                        <img src="{{ related.get_image_url }}" alt="{{ related.product_name }}">
-                                    {% else %}
-                                        <span>No Image</span>
-                                    {% endif %}
-                                </div>
-                                <div class="product-card-info">
-                                    <div class="product-card-brand">{{ related.brand.brand_name }}</div>
-                                    <div class="product-card-name">{{ related.product_name }}</div>
-                                    <div class="product-card-price">BDT {{ related.price|floatformat:2 }}</div>
-                                </div>
-                            </div>
-                        </a>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
         </div>
+        {% endif %}
     </div>
+    </div>
+
+    <script>
+        function showPopup(productName) {
+            const popup = document.createElement('div');
+            popup.className = 'popup-message show';
+            popup.innerHTML = `
+                <div class="icon">✅</div>
+                <div class="content">
+                    <div class="title">Added to Cart!</div>
+                    <div class="text">${productName}</div>
+                </div>
+            `;
+            document.body.appendChild(popup);
+        }
+
+        function handleAddToCart(event, productName) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    showPopup(productName);
+                } else {
+                    form.submit();
+                }
+            })
+            .catch(() => {
+                form.submit();
+            });
+            
+            return false;
+        }
+    </script>
 </body>
 </html>
